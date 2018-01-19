@@ -1,0 +1,7 @@
+*.out
+*.log
+*.aux
+
+
+demo/sh-demo
+paper/sh.pdf
