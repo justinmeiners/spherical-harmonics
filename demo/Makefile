@@ -1,7 +1,12 @@
 TARGET = sh-demo
 SRC = *.c
-FLAGS = -O3
+LIBS=-lSDL2 -framework OpenGL
+DLINCLUDE=/usr/local/include/
+SDLLIB=/usr/local/lib/
+IFLAGS=-I${SDLINCLUDE} -L${SDLLIB}
+FLAGS = 
 CC = gcc
 
 ${TARGET}: ${SRC}
-	${CC} ${FLAGS} $^ -o $@
+	${CC} ${FLAGS} ${IFLAGS} ${LIBS} $^ -o $@
+
