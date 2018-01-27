@@ -24,8 +24,9 @@ uniform samplerCube u_cube;\n\
 varying mediump vec3 v_normal;\n\
 void main() \
 { \
-gl_FragColor = textureCube(u_cube, v_normal); \
+gl_FragColor = vec4(v_normal.y * 0.488603, 0.0, 0.0, 1.0); \
 }";
+
 
 
 static GLuint compile_shader(GLint shaderType, const char* shaderSource, int debug)

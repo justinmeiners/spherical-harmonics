@@ -83,3 +83,15 @@ float2 sampleCube(
 }
 ```
 
+enum 
+{
+    CUBE_FACE_RIGHT = 0, // x+
+    CUBE_FACE_LEFT,  // x-
+    CUBE_FACE_TOP,   // y+
+    CUBE_FACE_BOTTOM,// y-
+    CUBE_FACE_BACK,  // z+
+    CUBE_FACE_FRONT, // z-
+    CUBE_FACE_COUNT
+} CubeFace;
+
+

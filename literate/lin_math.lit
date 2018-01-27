@@ -39,6 +39,7 @@ Vec3 vec3_cross(Vec3 a, Vec3 b);
 float vec3_norm(Vec3 a);
 Vec3 vec3_unit(Vec3 a);
 Vec3 vec3_negate(Vec3 a);
+Vec3 vec3_abs(Vec3 a);
 int vec3_eq(Vec3 a, Vec3 b);
 ---
 
@@ -140,6 +141,14 @@ Vec3 vec3_negate(Vec3 a)
     a.x = -a.x;
     a.y = -a.y;
     a.z = -a.z;
+    return a;
+}
+
+Vec3 vec3_abs(Vec3 a)
+{
+    a.x = fabs(a.x);
+    a.y = fabs(a.y);
+    a.z = fabs(a.z);
     return a;
 }
 

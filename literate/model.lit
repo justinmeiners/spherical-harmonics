@@ -142,6 +142,7 @@ typedef struct
 --- texture functions --- noWeave
 Texture texture_load(const char* path);
 Texture cubemap_load(const char** path);
+unsigned char* cubemap_sample(Texture* texture, Vec3 v);
 ---
 
 --- load texture
@@ -190,6 +191,45 @@ Texture cubemap_load(const char** paths)
 
     return texture;
 }
+---
+
+
+--- sample cubemap
+
+unsigned char* sample_cubemap(Texture* texture, Vec3 v)
+{
+    Vec3 v_abs = vec3_abs(v);
+    Vec2 uv;
+    int face_index;
+    
+    if (v_abs.x >= v_abs.y && v_abs.x >= v_abs.z)
+    {
+        face_index = (v.x >= 0.0f) ? 0 : 1;
+        uv.x = (v.x >= 0.0f) ? -v.z : v.z;
+        uv.y = v.y;
+    } 
+    else if (v_abs.y >= v_abs.z)
+    {
+        face_index = (v.y >= 0.0f) ? 2 : 3;
+        uv.x = v.x;  
+        uv.y = (v.y >= 0.0f) ? -v.z : v.z;
+    }
+    else
+    {
+        face_index = (v.z >= 0.0f) ? 4 : 5;
+        uv.x = (v.z >= 0.0f) : v.x ? -v.x;
+        uv.y = v.y;
+    }
+
+    uv.x *= 0.5f + 0.5f;
+    uv.y *= 0.5f + 0.5f;
+
+
+    size_t start = texture->image_info[face_index].offset;
+
+}
+
+
 ---
 
 --- mesh.h --- noWeave
