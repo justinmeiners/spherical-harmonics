@@ -1,7 +1,5 @@
 *.out
 *.log
 *.aux
-
-
 demo/sh-demo
-paper/sh.pdf
+literate/_book

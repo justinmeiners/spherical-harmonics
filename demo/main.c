@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
-#include "scene.h"
+
+void render_init();
+void render_frame(int mouse_dx, int mouse_dy);
 
 int g_windowWidth = 800;
 int g_windowHeight = 600;
@@ -42,7 +44,7 @@ int main(int argc, const char * argv[])
     SDL_GL_SetSwapInterval(1);   
     glViewport(0, 0, g_windowWidth, g_windowHeight);
 
-    scene_init(); 
+    render_init(); 
      
     int quit = 0;
     int dragging = 0;
@@ -86,7 +88,7 @@ int main(int argc, const char * argv[])
             previous_mouse_y = y;
         }
 
-        scene_render(dx, dy);
+        render_frame(dx, dy);
         SDL_GL_SwapWindow(window); 
     }
     
@@ -94,4 +96,5 @@ int main(int argc, const char * argv[])
     
     return 0;
 }
+
 

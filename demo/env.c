@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "env.h"
 
 static float fact_table[] =
 {
@@ -14,3 +15,5 @@ float fast_fact(int n)
     assert(n >= 0 && n < sizeof(fact_table) / sizeof(float));
     return fact_table[n];
 }
+
+

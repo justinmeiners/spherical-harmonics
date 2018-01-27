@@ -1,31 +1,8 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <OpenGL/gl3.h>
 #include "mesh.h"
-#include "texture.h"
-
-typedef struct
-{
-    Vec3 eye;
-    Vec3 target;
-    Mat4 eye_rotation;
-
-    Mesh demo;
-    Texture cube;
-
-    GLuint object_prog;
-    GLuint object_vert;
-    GLuint object_frag;
-} Scene;
-
-Scene scene;
-
-enum
-{
-    ATTRIB_VERTEX = 0,
-    ATTRIB_NORMAL,
-};
-
 
 const char* vert_shader_source = " \
 #version 100\n\
@@ -75,6 +52,12 @@ static GLuint compile_shader(GLint shaderType, const char* shaderSource, int deb
     return shader;
 }
 
+enum
+{
+    ATTRIB_VERTEX = 0,
+    ATTRIB_NORMAL,
+};
+
 static void upload_mesh(Mesh* mesh)
 {
     GLuint vao, vbo;
@@ -122,7 +105,25 @@ static void upload_cubemap(Texture* texture)
     texture->pbo = tex;
 }
 
-void scene_init()
+
+typedef struct
+{
+    Vec3 eye;
+    Vec3 target;
+    Mat4 eye_rotation;
+
+    Mesh demo;
+    Texture cube;
+
+    GLuint object_prog;
+    GLuint object_vert;
+    GLuint object_frag;
+} Scene;
+
+
+Scene scene;
+
+void render_init()
 {
     glEnable(GL_DEPTH_TEST);
 
@@ -155,7 +156,9 @@ void scene_init()
     glLinkProgram(scene.object_prog);
 }
 
-void scene_render(int mouse_dx, int mouse_dy)
+
+
+void render_frame(int mouse_dx, int mouse_dy)
 {
     Mat4 x_rot = mat4_create_rotate(mouse_dx / 100.0f, vec3_create(0.0f, 1.0f, 0.0f));
     Mat4 y_rot = mat4_create_rotate(mouse_dy / 100.0f, vec3_create(1.0f, 0.0f, 0.0f));
@@ -182,3 +185,6 @@ void scene_render(int mouse_dx, int mouse_dy)
     for (GLenum err; (err = glGetError()) != GL_NO_ERROR;)
         printf("%x\n", err); 
 }
+
+
+

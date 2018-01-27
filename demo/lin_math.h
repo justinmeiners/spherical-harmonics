@@ -1,7 +1,7 @@
-#ifndef LIN_MATH
-#define LIN_MATH
+#ifndef LIN_MATH_H
+#define LIN_MATH_H
 
-#include <math.h>
+#include "math.h"
 
 typedef struct
 {
@@ -37,14 +37,13 @@ void mat4_identity(Mat4* m);
 void mat4_copy(Mat4* dest, const Mat4* src);
 void mat4_mult(const Mat4* a, const Mat4* b, Mat4* ab);
 Vec3 mat4_mult_vec3(Mat4* m, Vec3 v);
-
 Mat4 mat4_create_identity();
 Mat4 mat4_create_frustum(float left, float right, float bottom, float top, float near, float far);
 Mat4 mat4_create_perspective(float fov, float aspect, float near, float far);
 Mat4 mat4_create_translate(Vec3 v);
 Mat4 mat4_create_rotate(float angle, Vec3 axis);
 Mat4 mat4_create_look(Vec3 eye, Vec3 target, Vec3 up);
-
 void mat4_print(const Mat4* m);
 
 #endif
+

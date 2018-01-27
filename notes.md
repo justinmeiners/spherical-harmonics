@@ -15,6 +15,13 @@ Prove its rotationally invariant?
 
 The spherical harmonics are defined in terms of legendre polynomials.
 
+### Solving Laplacian in Spherical coordinates
+
+https://math.stackexchange.com/questions/1325594/converting-a-differential-equation-to-polar-coordinates
+
+http://mathworld.wolfram.com/LaplacesEquation.html
+> A solution to Laplace's equation has the property that the average value over a spherical surface is equal to the value at the center of the sphere
+
 
 ### Encoding
 
@@ -42,7 +49,37 @@ Scale the basis functions by the coeffecients and add them together.
 3. We now have the coeffecient for that SH function.
 
 
+### Cube maps
 
 Sample Cube maps - http://www.humus.name/index.php?page=Textures
 
+```
+float2 sampleCube(
+    const float3 v,
+    out float faceIndex)
+{
+	float3 vAbs = abs(v);
+	float ma;
+	float2 uv;
+	if(vAbs.z >= vAbs.x && vAbs.z >= vAbs.y)
+	{
+		faceIndex = v.z < 0.0 ? 5.0 : 4.0;
+		ma = 0.5 / vAbs.z;
+		uv = float2(v.z < 0.0 ? -v.x : v.x, -v.y);
+	}
+	else if(vAbs.y >= vAbs.x)
+	{
+		faceIndex = v.y < 0.0 ? 3.0 : 2.0;
+		ma = 0.5 / vAbs.y;
+		uv = float2(v.x, v.y < 0.0 ? -v.z : v.z);
+	}
+	else
+	{
+		faceIndex = v.x < 0.0 ? 1.0 : 0.0;
+		ma = 0.5 / vAbs.x;
+		uv = float2(v.x < 0.0 ? v.z : -v.z, -v.y);
+	}
+	return uv * ma + 0.5;
+}
+```
 

@@ -1,0 +1,15 @@
+@book
+@title Spherical Harmonics
+
+
+Welcome to my explanation of Spherical Harmonics!
+
+
+Spherical Harmonics
+
+[Theory](theory.lit)
+[Env](env.lit)
+[Model](model.lit)
+[Linear Algebra Utilities](lin_math.lit)
+[SDL Setup](sdl.lit)
+
