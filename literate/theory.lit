@@ -1,9 +1,90 @@
 
+@s Introduction
+
+In realtime computer graphics, environment maps are often used to simulate light reflected from the scene.
+
+Typically reflection probes are placed throughout the scene. At each probe, images of the surrounding enviornment are rendered to create a cubemap. At runtime, other scene objects search for the nearest probes and use its cubemaps to calculate reflections and ambient lighting.
+
+Unfortuantly, cubemaps require a significant amount of memory. A very low resolution RGB cubemap uses $64\times64\times6\times3\approx73kb$ and a high resolution RGB cubemap uses $1024\times1024\times6\times3\approx18mb$! Even though smooth reflections, such as glass or mirrors, require such high resolution, most enviornmental lighting is low frequency, meaning changes between shades are gradual.
+
+Since ambient light is low frequency, we can aim for a broad approximation of the overall signal, instead of crisp images. Valve's source engine accomplishes this by averaging the cubemap to a single color for each face. [1] Each of these colors is passed to the vertex shader and the surface normal is used to interpolate between values.
+
+Valve's Ambient Cube is effecient and provides a richer ambient than a constant term, but only provides a rough approximation of ambient lighting. To store more complex ambient lighting we can use **spherical harmonics**. As we will explore, a good spherical harmonic approximation requires only 9 coeffecients to be stored, and is much richer than Valve's Ambient Cube.
+
+These images from Valve's paper compare these three methods:
+
+![enviornment map](img/ball_env.jpg)
+![valve ambient cube](img/ball_cube.jpg)
+![valve ambient cube](img/ball_sh.jpg)
+
+
+This paper will explain the mathematical theory behind spherical harmonics and how to implement it. The method described in this paper was introduced by Ramamoorthi. [2]
+
 @s Spherical Harmonics
 
-Laplace's equation states.
+Laplace's equation states: $$\nabla\cdot\nabla f=0$$
 
-$ \nabla \dot f=0$
+This is a partial differential equation. Equations which satisfy Laplace's equation are called **harmonics**. [3] 
 
-The spherical harmonics are solutions to laplace's equation in spherical coordinates.
+
+The solutions are found below. [4]
+
+For $l=0$:
+
+$$\frac{1}{2\sqrt{\pi}}=$$
+
+For $l=1$:
+
+$$\frac{\sqrt{3}}{2\sqrt{2\pi}}$$
+
+
+Here is what some of these solutions look like:
+
+![spherical harmonics](img/sh.jpg)
+
+The big idea is that we can take any function on a sphere (such as a light signal) and approximate it using sphereical harmonics. We simply calculate how much each term contributes to the overall signal and save those coeffecients. To recreate the signal we add up individual terms multiplied by the weighting coeffecients. This idea is very similar to fourier series in two dimensions.
+
+
+How do we calculate how much each term contributes? The inner product gives us the component of a vector along another vector. 
+
+let $l(x)$ be the function on the sphere and $h(x)$ be the spherical harmonic, and $S$ be the sphere surface.
+
+$$ \int_{S} h(x)l(x) dv$$
+
+For computational purposes we will do a discrete integral.
+
+$$ \frac{1}{N} \sum_{i=0}^{N} h(x_{i})l(x_{i}) $$
+
+
+@s Laplace's Equation in Spherical Coordinates
+
+By substituting variables, the 3 dimensional Laplace's equation can be transformed into spherical coordinates. This procedure is similar to change of variables for spherical integrals in multivariable calculus.
+
+A 3D sphere can be parameterized by three variables:
+
+$$x=\rho \sin(\phi)\cos(\theta)$$
+$$y=\rho \sin(\phi)\sin(\theta)$$
+$$z=\rho \cos(\theta)$$
+$$\rho=x^2+y^2+z^2$$
+
+Recall that in 3 dimensions Laplace's equation looks like:
+
+$$\frac{\partial^{2} f}{\partial x^{2}}+\frac{\partial^{2} f}{\partial y^{2}}+\frac{\partial^{2} f}{\partial z^{2}}=0$$
+
+
+@s References
+
+
+1. [Shading in Valve's Source Engine](http://www.valvesoftware.com/publications/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf)
+2. [An Effecient Representation for Irradiance Environment Maps](https://graphics.stanford.edu/papers/envmap/)
+3. [MathWorld Laplace's Equation](http://mathworld.wolfram.com/LaplacesEquation.html)
+4. Linearity, Symmetry, And Prediction In The Hydrogen Atom
+
+
+
+
+
+
+
+
 
