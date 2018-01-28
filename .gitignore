@@ -2,4 +2,5 @@
 *.log
 *.aux
 demo/sh-demo
+demo/approx-cube
 literate/_book
