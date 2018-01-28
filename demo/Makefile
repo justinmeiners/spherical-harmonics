@@ -4,9 +4,15 @@ LIBS=-lSDL2 -framework OpenGL
 DLINCLUDE=/usr/local/include/
 SDLLIB=/usr/local/lib/
 IFLAGS=-I${SDLINCLUDE} -L${SDLLIB}
-FLAGS = 
 CC = gcc
 
-${TARGET}: ${SRC}
-	${CC} ${FLAGS} ${IFLAGS} ${LIBS} $^ -o $@
+
+all: sh-demo approx-cube
+	echo "building"
+
+sh-demo: render.c sdl_main.c texture.c mesh.c lin_math.c
+	${CC} -O3 ${IFLAGS} ${LIBS} $^ -o $@
+
+approx-cube: approx_cube.c texture.c
+	${CC} -O3 $^ -o $@
 

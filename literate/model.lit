@@ -142,7 +142,6 @@ typedef struct
 --- texture functions --- noWeave
 Texture texture_load(const char* path);
 Texture cubemap_load(const char** path);
-unsigned char* cubemap_sample(Texture* texture, Vec3 v);
 ---
 
 --- load texture
@@ -195,7 +194,6 @@ Texture cubemap_load(const char** paths)
 
 
 --- sample cubemap
-
 unsigned char* sample_cubemap(Texture* texture, Vec3 v)
 {
     Vec3 v_abs = vec3_abs(v);
@@ -232,26 +230,23 @@ unsigned char* sample_cubemap(Texture* texture, Vec3 v)
 
 ---
 
---- mesh.h --- noWeave
-#ifndef MESH_H
-#define MESH_H
+--- texture.h --- noWeave
+#ifndef TEXTURE_H
+#define TEXTURE_H
 
-#include "lin_math.h"
+#include <stdlib.h>
 
-@{mesh struct}
 @{texture struct}
-@{mesh functions}
 @{texture functions}
 
 #endif
 ---
---- mesh.c --- noWeave
 
+--- texture.c --- noWeave
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include "mesh.h"
+#include "texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_LINEAR 1
@@ -262,9 +257,29 @@ unsigned char* sample_cubemap(Texture* texture, Vec3 v)
 
 #include "stb_image.h"
 
-@{smooth mesh}
-@{load mesh}
-
 @{load texture}
 @{load cubemap}
+---
+
+
+--- mesh.h --- noWeave
+#ifndef MESH_H
+#define MESH_H
+
+#include "lin_math.h"
+
+@{mesh struct}
+@{mesh functions}
+
+#endif
+---
+--- mesh.c --- noWeave
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "mesh.h"
+
+@{smooth mesh}
+@{load mesh}
 ---

@@ -29,6 +29,7 @@ Vec3 vec3_cross(Vec3 a, Vec3 b);
 float vec3_norm(Vec3 a);
 Vec3 vec3_unit(Vec3 a);
 Vec3 vec3_negate(Vec3 a);
+Vec3 vec3_abs(Vec3 a);
 int vec3_eq(Vec3 a, Vec3 b);
 
 #define mat4_get(Mat, x, y) ((Mat)->m[((x) * 4) + (y)])

@@ -94,4 +94,6 @@ enum
     CUBE_FACE_COUNT
 } CubeFace;
 
+http://www.rorydriscoll.com/2012/01/15/cubemap-texel-solid-angle/
+
 

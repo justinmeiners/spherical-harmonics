@@ -8,8 +8,8 @@ Welcome to my explanation of Spherical Harmonics!
 Spherical Harmonics
 
 [Theory](theory.lit)
-[Env](env.lit)
+[Cubemap Approximation](cube.lit)
 [Model](model.lit)
+[Demo](demo.lit)
 [Linear Algebra Utilities](lin_math.lit)
-[SDL Setup](sdl.lit)
 

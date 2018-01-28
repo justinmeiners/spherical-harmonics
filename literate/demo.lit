@@ -116,13 +116,26 @@ gl_Position = u_proj * u_view * a_vertex; \
 --- fragment shader
 const char* frag_shader_source = " \
 #version 100\n\
+
+float sh9(mat3 coef, vec3 n)
+{
+    float sum;
+    sum += coef[0][0] * 2.82095;
+    sum += coef[1][0] * 4.8860 * n.x;
+    sum += coef[2][0] * 4.8860 * n.z;
+    sum += coef[0][1] * 4.8860 * n.y;
+    sum += coef[1][1] * 1.092548 * n.x * n.z;
+    sum += coef[2][1] * 1.092548 * n.y * n.z;
+    sum += coef[0][2] * 1.092548 * n.x * n.y; 
+    return sum;
+}
+
 uniform samplerCube u_cube;\n\
 varying mediump vec3 v_normal;\n\
 void main() \
 { \
 gl_FragColor = vec4(v_normal.y * 0.488603, 0.0, 0.0, 1.0); \
 }";
-
 ---
 
 @s OpenGL Utilities
@@ -317,6 +330,7 @@ int main(int argc, const char * argv[])
 #include <stdlib.h>
 #include <OpenGL/gl3.h>
 #include "mesh.h"
+#include "texture.h"
 
 @{vertex shader}
 @{fragment shader}
@@ -333,7 +347,7 @@ Scene scene;
 @{render a frame}
 ---
 
---- main.c --- noWeave
+--- sdl_main.c --- noWeave
 #include <SDL2/SDL.h>
 
 @{render functions}

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <OpenGL/gl3.h>
 #include "mesh.h"
+#include "texture.h"
 
 const char* vert_shader_source = " \
 #version 100\n\
@@ -26,7 +27,6 @@ void main() \
 { \
 gl_FragColor = vec4(v_normal.y * 0.488603, 0.0, 0.0, 1.0); \
 }";
-
 
 
 static GLuint compile_shader(GLint shaderType, const char* shaderSource, int debug)

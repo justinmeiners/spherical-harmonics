@@ -82,6 +82,14 @@ Vec3 vec3_negate(Vec3 a)
     return a;
 }
 
+Vec3 vec3_abs(Vec3 a)
+{
+    a.x = fabs(a.x);
+    a.y = fabs(a.y);
+    a.z = fabs(a.z);
+    return a;
+}
+
 int vec3_eq(Vec3 a, Vec3 b)
 {
     return a.x == b.x && a.y == b.y && a.z == b.z;

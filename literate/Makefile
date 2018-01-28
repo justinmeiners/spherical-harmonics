@@ -1,4 +1,4 @@
-SRC=sh.lit
+SRC=index.lit
 DEMO_DIR=../demo/
 
 all: tangle html
