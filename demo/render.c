@@ -23,16 +23,16 @@ const char* frag_shader_source = " \
 #version 100\n\
 mediump float sh9(mediump mat3 coef, mediump vec3 n)\n \
 {\n \
-    mediump float sum = 0.0; \
-    sum += coef[0][0] * 2.82095; \
-    sum += coef[1][0] * 4.8860 * n.x; \
-    sum += coef[2][0] * 4.8860 * n.z; \
-    sum += coef[0][1] * 4.8860 * n.y; \
-    sum += coef[1][1] * 1.092548 * n.x * n.z; \
-    sum += coef[2][1] * 1.092548 * n.y * n.z; \
-    sum += coef[0][2] * 1.092548 * n.x * n.y; \
-    sum += coef[1][2] * 0.315391 * (3.0 * n.z*n.z - 1.0); \
-    sum += coef[2][2] * 0.546274 * (n.x*n.x - n.y*n.y);  \
+    mediump float sum =  \
+    coef[0][0] * 0.282095 \
+    + coef[1][0] * 0.488603 * n.x \
+    + coef[2][0] * 0.488603 * n.z \
+    + coef[0][1] * 0.488603 * n.y \
+    + coef[1][1] * 1.092548 * n.x * n.z \
+    + coef[2][1] * 1.092548 * n.y * n.z \
+    + coef[0][2] * 1.092548 * n.x * n.y \
+    + coef[1][2] * 0.315391 * (3.0 * n.z*n.z - 1.0) \
+    + coef[2][2] * 0.546274 * (n.x*n.x - n.y*n.y);  \
     return sum; \
 } \n \
 uniform mediump mat3 sh_r; \
@@ -48,9 +48,9 @@ if (use_cube) { \
 } else { gl_FragColor = vec4(sh9(sh_r, v_normal), sh9(sh_g, v_normal), sh9(sh_b, v_normal), 1.0); }\
 }";
 
-const float sh9_red[] = {0.157103, 0.001953, -0.009742, 0.004376, -0.006120, -0.017138, -0.011381, 0.120380, -0.028884};
-const float sh9_green[] = {0.157094, 0.001950, -0.009746, 0.004379, -0.006122, -0.017133, -0.011371, 0.120368, -0.028883, };
-const float sh9_blue[] = {0.157094, 0.001950, -0.009746, 0.004379, -0.006122, -0.017133, -0.011371, 0.120368, -0.028883, };
+const float sh9_red[] = {2.306290, -0.002908, -0.077373, 0.339365, -0.076132, 0.056290, -0.020493, -0.646626, -0.112228, };
+const float sh9_green[] = {2.184796, -0.000868, -0.065629, 0.377558, -0.080363, 0.052740, -0.020638, -0.620614, -0.088419, };
+const float sh9_blue[] = {2.062208, 0.022677, -0.051672, 0.432432, -0.090587, 0.048866, -0.020496, -0.607719, -0.067602, };
 
 
 static GLuint compile_shader(GLint shaderType, const char* shaderSource, int debug)
@@ -160,7 +160,7 @@ void render_init()
     scene.target = vec3_create(0.0f, 1.0f, 0.0f);
     scene.eye_rotation = mat4_create_identity();
 
-    scene.demo = mesh_load("data/astronaut.stl");
+    scene.demo = mesh_load("data/ball.stl");
     upload_mesh(&scene.demo);
 
     const char* paths[] = {"data/cube1/posx.jpg",

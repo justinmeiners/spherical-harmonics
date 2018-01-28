@@ -46,6 +46,12 @@ static double sh9(int i, double x, double y, double z)
 --- 
 
 --- integrate cubemap
+
+static double surface_area(double x, double y)
+{
+    return atan2(x * y, sqrt(x * x + y * y + 1.0));
+}
+
 static ShCoeffs integrate_cubemap(Texture* cubemap)
 {
     ShCoeffs coeffs;
@@ -57,6 +63,10 @@ static ShCoeffs integrate_cubemap(Texture* cubemap)
         coeffs.b[i] = 0.0;
     }
 
+    double d_x = 1.0 / (double)cubemap->width;
+    double d_y = d_x;
+    double sum_da = 0.0;
+
     for (int face = 0; face < CUBE_FACE_COUNT; ++face)
     {
         size_t offset = cubemap->image_info[face].offset;
@@ -65,50 +75,64 @@ static ShCoeffs integrate_cubemap(Texture* cubemap)
         {
             for (int x = 0; x < cubemap->width; ++x)
             {
-                double uv_x = ((x / (double)cubemap->width) - 0.5f) * 2.0f;
-                double uv_y = ((y / (double)cubemap->height) - 0.5f) * 2.0f;
+                double px = (double)x + 0.5;
+                double py = (double)y + 0.5;
+                double u = 2.0 * (px / (double)cubemap->width) - 1.0;
+                double v = 2.0 * (px / (double)cubemap->height) - 1.0;
+
+                double x0 = u - d_x;
+                double y0 = v - d_y;
+                double x1 = u + d_x;
+                double y1 = v + d_y;
+
+                double d_a = surface_area(x0, y0) - surface_area(x0, y1) - surface_area(x1, y0) + surface_area(x1, y1);
 
                 double dir_x, dir_y, dir_z;
                 switch (face)
                 {
                     case CUBE_FACE_RIGHT:
                         dir_x = 1.0f;
-                        dir_y = uv_y;
-                        dir_z = -uv_x;
+                        dir_y = v;
+                        dir_z = -u;
                         break;
                     case CUBE_FACE_LEFT:
                         dir_x = -1.0f;
-                        dir_y = uv_y;
-                        dir_z = uv_x;
+                        dir_y = v;
+                        dir_z = u;
                         break;
                     case CUBE_FACE_TOP:
-                        dir_x = uv_x;
+                        dir_x = u;
                         dir_y = 1.0f;
-                        dir_z = -uv_y; 
+                        dir_z = -v; 
                         break;
                     case CUBE_FACE_BOTTOM:
-                        dir_x = uv_x;
+                        dir_x = u;
                         dir_y = -1.0f;
-                        dir_z = uv_y;
+                        dir_z = v;
                         break;
                     case CUBE_FACE_BACK: 
-                        dir_x = uv_x;
-                        dir_y = uv_y;
+                        dir_x = u;
+                        dir_y = v;
                         dir_z = 1.0f;
                         break;
                     case CUBE_FACE_FRONT:
-                        dir_x = -uv_x;
-                        dir_y = uv_y;
+                        dir_x = -u;
+                        dir_y = v;
                         dir_z = -1.0f;
                         break;
                 }
+                float norm = 1.0 / (dir_x * dir_x + dir_y * dir_y + dir_z * dir_z);
+                dir_x *= norm;
+                dir_y *= norm;
+                dir_z *= norm;
 
-                size_t pixel_start = offset + x + y * cubemap->width * 3;
+                size_t pixel_start = offset + (x + y * cubemap->width) * 3;
                 double red = cubemap->data[pixel_start] / 255.0;
                 double green = cubemap->data[pixel_start + 1] / 255.0;
                 double blue = cubemap->data[pixel_start + 2] / 255.0;
 
-                double weight = 1.0 / ((double)cubemap->width * (double)cubemap->height * 6.0);
+                double weight = d_a;
+                sum_da += weight;
 
                 for (int i = 0; i < SH_COUNT; ++i)
                 {
@@ -120,6 +144,8 @@ static ShCoeffs integrate_cubemap(Texture* cubemap)
             }
         }
     }
+    printf("%f\n", surface_area(1,1));
+    printf("%f\n", sum_da);
     return coeffs;
 }
 ---
@@ -164,7 +190,7 @@ int main(int argc, const char* argv[])
     printf("blue {");
     for (int i = 0; i < SH_COUNT; ++i)
     {
-        printf("%f, ", coeffs.g[i]);
+        printf("%f, ", coeffs.b[i]);
     }
     printf("}\n");
 
