@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 
 void render_init();
+void render_change_view();
 void render_frame(int mouse_dx, int mouse_dy);
 
 int g_windowWidth = 800;
@@ -50,7 +51,7 @@ int main(int argc, const char * argv[])
     int dragging = 0;
 
     int previous_mouse_x;
-    int previous_mouse_y;
+    int previous_mouse_y; 
     
     while (!quit)
     {
@@ -73,6 +74,13 @@ int main(int argc, const char * argv[])
                 case SDL_MOUSEBUTTONUP:
                     dragging = 0;
                     break;
+                case SDL_KEYUP:
+                    if (e.key.keysym.scancode == SDL_SCANCODE_V)
+                    {
+                        render_change_view();
+                    }
+                    break;
+                    
            }
         }
 

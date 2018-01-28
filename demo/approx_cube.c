@@ -20,21 +20,21 @@ static double sh9(int i, double x, double y, double z)
         case 0:
             return 0.5 * sqrt(1.0 / M_PI);
         case 1:
-            return y * 0.5 * sqrt(3.0 / M_PI);
-        case 2:
             return x * 0.5 * sqrt(3.0 / M_PI);
-        case 3:
+        case 2:
             return z * 0.5 * sqrt(3.0 / M_PI);
+        case 3:
+            return y * 0.5 * sqrt(3.0 / M_PI);
         case 4:
-            return x * y * 0.5 * sqrt(15.0 / M_PI);
+            return x * z * 0.5 * sqrt(15.0 / M_PI);
         case 5:
             return y * z * 0.5 * sqrt(15.0 / M_PI);
         case 6:
-            return (2.0 * z*z - x*x - y*y) * 0.25 * sqrt(5.0 / M_PI);
+            return x * y * 0.5 * sqrt(15.0 / M_PI);
         case 7:
-            return x * z * 0.5 * sqrt(15.0 / M_PI);
+            return (3.0 * z*z - 1.0) * 0.25 * sqrt(5.0 / M_PI);
         case 8:
-            return (x*x - y*y) * 0.5 * sqrt(15.0 / M_PI);
+            return (x*x - y*y) * 0.25 * sqrt(15.0 / M_PI);
         default:
             assert(0);
             return 0;

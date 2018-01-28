@@ -11,8 +11,8 @@ all: sh-demo approx-cube
 	echo "building"
 
 sh-demo: render.c sdl_main.c texture.c mesh.c lin_math.c
-	${CC} -O3 ${IFLAGS} ${LIBS} $^ -o $@
+	${CC} -Os ${IFLAGS} ${LIBS} $^ -o $@
 
 approx-cube: approx_cube.c texture.c
-	${CC} -O3 $^ -o $@
+	${CC} -Os $^ -o $@
 

@@ -21,18 +21,41 @@ gl_Position = u_proj * u_view * a_vertex; \
 
 const char* frag_shader_source = " \
 #version 100\n\
-uniform samplerCube u_cube;\n\
-varying mediump vec3 v_normal;\n\
+mediump float sh9(mediump mat3 coef, mediump vec3 n)\n \
+{\n \
+    mediump float sum = 0.0; \
+    sum += coef[0][0] * 2.82095; \
+    sum += coef[1][0] * 4.8860 * n.x; \
+    sum += coef[2][0] * 4.8860 * n.z; \
+    sum += coef[0][1] * 4.8860 * n.y; \
+    sum += coef[1][1] * 1.092548 * n.x * n.z; \
+    sum += coef[2][1] * 1.092548 * n.y * n.z; \
+    sum += coef[0][2] * 1.092548 * n.x * n.y; \
+    sum += coef[1][2] * 0.315391 * (3.0 * n.z*n.z - 1.0); \
+    sum += coef[2][2] * 0.546274 * (n.x*n.x - n.y*n.y);  \
+    return sum; \
+} \n \
+uniform mediump mat3 sh_r; \
+uniform mediump mat3 sh_g;  \
+uniform mediump mat3 sh_b;  \
+uniform samplerCube u_cube; \
+varying mediump vec3 v_normal;\
+uniform bool use_cube; \
 void main() \
 { \
-gl_FragColor = vec4(v_normal.y * 0.488603, 0.0, 0.0, 1.0); \
+if (use_cube) { \
+    gl_FragColor = textureCube(u_cube, v_normal); \
+} else { gl_FragColor = vec4(sh9(sh_r, v_normal), sh9(sh_g, v_normal), sh9(sh_b, v_normal), 1.0); }\
 }";
+
+const float sh9_red[] = {0.157103, 0.001953, -0.009742, 0.004376, -0.006120, -0.017138, -0.011381, 0.120380, -0.028884};
+const float sh9_green[] = {0.157094, 0.001950, -0.009746, 0.004379, -0.006122, -0.017133, -0.011371, 0.120368, -0.028883, };
+const float sh9_blue[] = {0.157094, 0.001950, -0.009746, 0.004379, -0.006122, -0.017133, -0.011371, 0.120368, -0.028883, };
 
 
 static GLuint compile_shader(GLint shaderType, const char* shaderSource, int debug)
 {
     GLuint shader = glCreateShader(shaderType);
-
     const char* sources[] = { shaderSource };
     glShaderSource(shader, 1, sources, NULL);
     glCompileShader(shader);
@@ -96,7 +119,6 @@ static void upload_cubemap(Texture* texture)
     }
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -112,6 +134,7 @@ typedef struct
     Vec3 eye;
     Vec3 target;
     Mat4 eye_rotation;
+    int view_cube;
 
     Mesh demo;
     Texture cube;
@@ -123,6 +146,11 @@ typedef struct
 
 
 Scene scene;
+
+void render_change_view()
+{
+    scene.view_cube = !scene.view_cube;
+}
 
 void render_init()
 {
@@ -158,7 +186,6 @@ void render_init()
 }
 
 
-
 void render_frame(int mouse_dx, int mouse_dy)
 {
     Mat4 x_rot = mat4_create_rotate(mouse_dx / 100.0f, vec3_create(0.0f, 1.0f, 0.0f));
@@ -178,6 +205,10 @@ void render_frame(int mouse_dx, int mouse_dy)
     glUniform1i(glGetUniformLocation(scene.object_prog, "u_cube"), 0);
     glUniformMatrix4fv(glGetUniformLocation(scene.object_prog, "u_proj"), 1, GL_FALSE, proj.m);
     glUniformMatrix4fv(glGetUniformLocation(scene.object_prog, "u_view"), 1, GL_FALSE, view.m);
+    glUniform1i(glGetUniformLocation(scene.object_prog, "use_cube"), scene.view_cube);
+    glUniformMatrix3fv(glGetUniformLocation(scene.object_prog, "sh_r"), 1, GL_FALSE, sh9_red);
+    glUniformMatrix3fv(glGetUniformLocation(scene.object_prog, "sh_g"), 1, GL_FALSE, sh9_green);
+    glUniformMatrix3fv(glGetUniformLocation(scene.object_prog, "sh_b"), 1, GL_FALSE, sh9_blue);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, scene.cube.pbo); 
     glBindVertexArray(scene.demo.vao);

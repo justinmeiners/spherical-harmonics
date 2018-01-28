@@ -104,8 +104,9 @@ static void mesh_smooth(Mesh* mesh)
 
     for (int i = 0; i < mesh->vertex_count; ++i)
     {
-        mesh->vertices[i].normal = smooth_normals[i];
+        mesh->vertices[i].normal = vec3_unit(smooth_normals[i]);
     }
+
     free(smooth_normals);
 }
 ---

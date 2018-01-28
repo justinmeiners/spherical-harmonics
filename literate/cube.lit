@@ -13,6 +13,8 @@ typedef struct
 } ShCoeffs;
 ---
 
+A table of spherical harmonics can be found [https://en.wikipedia.org/wiki/Table_of_spherical_harmonics](https://en.wikipedia.org/wiki/Table_of_spherical_harmonics).
+
 --- spherical harmonics
 static double sh9(int i, double x, double y, double z)
 {
@@ -33,9 +35,9 @@ static double sh9(int i, double x, double y, double z)
         case 6:
             return x * y * 0.5 * sqrt(15.0 / M_PI);
         case 7:
-            return (2.0 * z*z - x*x - y*y) * 0.25 * sqrt(5.0 / M_PI);
+            return (3.0 * z*z - 1.0) * 0.25 * sqrt(5.0 / M_PI);
         case 8:
-            return (x*x - y*y) * 0.5 * sqrt(15.0 / M_PI);
+            return (x*x - y*y) * 0.25 * sqrt(15.0 / M_PI);
         default:
             assert(0);
             return 0;
