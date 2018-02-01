@@ -1,5 +1,25 @@
+@code_type c .c
 
 @s Introduction
+
+In realtime computer graphics, objects are usually lit by both diffuse and ambient lighting. The diffuse lighting represents the direct radiance from nearby lights, while the ambient simulates light bounced from the scene. Since computing bounced lighting is usually too expensive for realtime rendering a much simpler replacement is use, with the most basic being a constant color (usually a dark gray) added to the diffuse light.
+
+
+![diffuse term](img/teapot_diffuse.png)
+![ambient term](img/teapot_ambient.png)
+![combined](img/teapot_combined.png)
+
+
+This paper is an explanation of the method described by Ramaoorthi. [2]
+I will explain how to calcluate a more rich ambient lighting 
+
+
+This paper will explain the mathematical theory behind spherical harmonics and how to implement it. The method described in this paper was introduced by Ramamoorthi. [2]
+
+
+@s Previous Work
+
+
 
 In realtime computer graphics, environment maps are often used to simulate light reflected from the scene.
 
@@ -18,7 +38,6 @@ These images from Valve's paper compare these three methods:
 ![valve ambient cube](img/ball_sh.jpg)
 
 
-This paper will explain the mathematical theory behind spherical harmonics and how to implement it. The method described in this paper was introduced by Ramamoorthi. [2]
 
 @s Spherical Harmonics
 
@@ -70,6 +89,222 @@ $$\rho=x^2+y^2+z^2$$
 Recall that in 3 dimensions Laplace's equation looks like:
 
 $$\frac{\partial^{2} f}{\partial x^{2}}+\frac{\partial^{2} f}{\partial y^{2}}+\frac{\partial^{2} f}{\partial z^{2}}=0$$
+
+@s Cubemap Approximation
+
+The following structure stores the 9 spherical harmonics coeffecients for each of the red, green, and blue color channels. The total number of coeffecients is 27.
+
+--- spherical harmonics struct
+#define SH_COUNT 9
+
+typedef struct
+{
+    float r[SH_COUNT];
+    float g[SH_COUNT];
+    float b[SH_COUNT];
+} ShCoeffs;
+---
+
+This function calculates one of the first 9 spherical harmonics at a particular point on the unit sphere. Even though they are derived from a complex formula, then end results are very simple calculations. The most complex is the 9th harmonic which is only a quadratic computation. A table of spherical harmonics can be found [https://en.wikipedia.org/wiki/Table_of_spherical_harmonics](https://en.wikipedia.org/wiki/Table_of_spherical_harmonics).
+
+--- spherical harmonics
+
+static inline double sh_1()
+{
+    return 0.5 * sqrt(1.0 / M_PI);
+}
+
+static inline double sh_2(double x)
+{
+    return x * 0.5 * sqrt(3.0 / M_PI);
+}
+
+static inline double sh_3(double z)
+{
+    return z * 0.5 * sqrt(3.0 / M_PI);
+}
+
+
+static double sh9(int i, double x, double y, double z)
+{
+    switch (i)
+    {
+        case 0:
+            return 0.5 * sqrt(1.0 / M_PI);
+        case 1:
+            return x * 0.5 * sqrt(3.0 / M_PI);
+        case 2:
+            return z * 0.5 * sqrt(3.0 / M_PI);
+        case 3:
+            return y * 0.5 * sqrt(3.0 / M_PI);
+        case 4:
+            return x * z * 0.5 * sqrt(15.0 / M_PI);
+        case 5:
+            return y * z * 0.5 * sqrt(15.0 / M_PI);
+        case 6:
+            return x * y * 0.5 * sqrt(15.0 / M_PI);
+        case 7:
+            return (3.0 * z*z - 1.0) * 0.25 * sqrt(5.0 / M_PI);
+        case 8:
+            return (x*x - y*y) * 0.25 * sqrt(15.0 / M_PI);
+        default:
+            assert(0);
+            return 0;
+    }
+}
+--- 
+
+
+--- solid angle
+static double surface_area(double x, double y)
+{
+    return atan2(x * y, sqrt(x * x + y * y + 1.0));
+}
+
+---
+
+
+For each spherical harmonic we need to calculute a coeffecient which describes how much a particular harmonic function contributes to the overall light signal. Each coeffecient is found by calculating the inner product of each function and the harmonic function.
+
+This calculation is a surface integral over the unit sphere of the product of the light signal and the harmonic function.
+
+$$ \int_{S} h(x)l(x) dv$$
+
+To calculate this integral we will use a discrete summation which approximates the analytic integral. This also makes sense because the cubemap is a discrete signal as well. There are only a finite number of pixels to include.
+
+$$ \frac{1}{N} \sum_{i=0}^{N} h(x_{i})l(x_{i}) $$
+
+In this formula $N$, the total number of pieces to sum, is the number of pixels on the cubemap.
+
+$$N=6w^{2}h^{2}$$
+
+--- integrate cubemap
+
+static ShCoeffs integrate_cubemap(Texture* cubemap)
+{
+    ShCoeffs coeffs;
+
+    // zero out the sums for accumlation
+    for (int i = 0; i < SH_COUNT; ++i)
+    {
+        coeffs.r[i] = 0.0;
+        coeffs.g[i] = 0.0;
+        coeffs.b[i] = 0.0;
+    }
+
+    double d_x = 1.0 / (double)cubemap->width;
+    double d_y = d_x;
+    double sum_da = 0.0;
+
+    for (int face = 0; face < CUBE_FACE_COUNT; ++face)
+    {
+        size_t offset = cubemap->image_info[face].offset;
+
+        for (int y = 0; y < cubemap->height; ++y)
+        {
+            for (int x = 0; x < cubemap->width; ++x)
+            {
+                // center each pixel
+                double px = (double)x + 0.5;
+                double py = (double)y + 0.5;
+                // normalize into [-1, 1] range
+                double u = 2.0 * (px / (double)cubemap->width) - 1.0;
+                double v = 2.0 * (py / (double)cubemap->height) - 1.0;
+
+                // calculate the solid angle
+                double x0 = u - d_x;
+                double y0 = v - d_y;
+                double x1 = u + d_x;
+                double y1 = v + d_y;
+
+                double d_a = surface_area(x0, y0) - surface_area(x0, y1) - surface_area(x1, y0) + surface_area(x1, y1);
+
+                double dir_x, dir_y, dir_z;
+                switch (face)
+                {
+                    case CUBE_FACE_RIGHT:
+                        dir_x = 1.0f;
+                        dir_y = v;
+                        dir_z = -u;
+                        break;
+                    case CUBE_FACE_LEFT:
+                        dir_x = -1.0f;
+                        dir_y = v;
+                        dir_z = u;
+                        break;
+                    case CUBE_FACE_TOP:
+                        dir_x = u;
+                        dir_y = 1.0f;
+                        dir_z = -v; 
+                        break;
+                    case CUBE_FACE_BOTTOM:
+                        dir_x = u;
+                        dir_y = -1.0f;
+                        dir_z = v;
+                        break;
+                    case CUBE_FACE_BACK: 
+                        dir_x = u;
+                        dir_y = v;
+                        dir_z = 1.0f;
+                        break;
+                    case CUBE_FACE_FRONT:
+                        dir_x = -u;
+                        dir_y = v;
+                        dir_z = -1.0f;
+                        break;
+                }
+                float norm = 1.0 / (dir_x * dir_x + dir_y * dir_y + dir_z * dir_z);
+                dir_x *= norm;
+                dir_y *= norm;
+                dir_z *= norm;
+
+                size_t pixel_start = offset + (x + y * cubemap->width) * 3;
+                double red = cubemap->data[pixel_start] / 255.0;
+                double green = cubemap->data[pixel_start + 1] / 255.0;
+                double blue = cubemap->data[pixel_start + 2] / 255.0;
+
+                double weight = d_a;
+                sum_da += weight;
+
+                for (int i = 0; i < SH_COUNT; ++i)
+                {
+                    double sh_val = sh9(i, dir_x, dir_y, dir_z);
+                    coeffs.r[i] += sh_val * red * weight;
+                    coeffs.g[i] += sh_val * green * weight;
+                    coeffs.b[i] += sh_val * blue * weight;
+                }
+            }
+        }
+    }
+    printf("total area: %f\n", sum_da);
+    return coeffs;
+}
+---
+
+--- sh9.h --- noWeave
+
+#ifndef SH_9_H
+#define SH_9_H
+
+
+#endif
+
+---
+
+--- sh9.c --- noWeave
+
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include "texture.h"
+
+@{spherical harmonics struct}
+@{spherical harmonics}
+@{solid angle}
+@{integrate cubemap}
+
+---
 
 
 @s References

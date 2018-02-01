@@ -22,6 +22,7 @@ gl_Position = u_proj * u_view * u_model * a_vertex; \
 
 const char* frag_shader_source = " \
 #version 100\n\
+precision mediump float; \n\
 mediump float sh9(mediump mat3 coef, mediump vec3 n)\n \
 {\n \
     mediump float sum =  \
@@ -43,10 +44,13 @@ uniform samplerCube u_cube; \
 varying mediump vec3 v_normal;\
 uniform bool use_cube; \
 void main() \
-{ \
+{ \ 
+    vec3 ambient = vec3(1.0); \
 if (use_cube) { \
-    gl_FragColor = textureCube(u_cube, v_normal); \
-} else { gl_FragColor = vec4(sh9(sh_r, v_normal), sh9(sh_g, v_normal), sh9(sh_b, v_normal), 1.0); }\
+    ambient = textureCube(u_cube, v_normal).xyz; \
+} else { ambient = vec3(sh9(sh_r, v_normal), sh9(sh_g, v_normal), sh9(sh_b, v_normal)); }\
+    float power = max(dot(v_normal, vec3(1.0, 1.0, 0.0)), 0.0); \
+    gl_FragColor = vec4(ambient + power * vec3(1.0, 1.0, 1.0), 1.0); \
 }";
 
 const float sh9_red[] = {0.602287, 0.075701, 0.037782, -0.007927, 0.022855, 0.014070, -0.034561, -0.207028, 0.283061, };
