@@ -13,29 +13,27 @@ int main(int argc, const char* argv[])
                            "data/cube2/negz.jpg"};
 
     Texture cube = cubemap_load(paths);
-    ShCoeffs coeffs = integrate_cubemap(&cube);
 
-    printf("red {");
-    for (int i = 0; i < SH_COUNT; ++i)
+    unsigned char* face_data[CUBE_FACE_COUNT];
+    for (int i = 0; i < 6; ++i)
     {
-        printf("%f, ", coeffs.r[i]);
+        face_data[i] = cube.data + cube.image_info[i].offset;
     }
-    printf("}\n");
 
-    printf("green {");
-    for (int i = 0; i < SH_COUNT; ++i)
+    ShChannel channels[3];
+    sh_integrate_cubemap(face_data, cube.width, cube.height, 3, channels);
+
+    char* channel_names [] = { "red", "green", "blue" };
+    for (int comp = 0; comp < 3; ++comp)
     {
-        printf("%f, ", coeffs.g[i]);
-    }
-    printf("}\n");
+        printf("%s {", channel_names[comp]);
+        for (int s = 0; s < SH_COUNT; ++s)
+        {
+            printf("%lf ", channels[comp].coeffs[s]);
 
-    printf("blue {");
-    for (int i = 0; i < SH_COUNT; ++i)
-    {
-        printf("%f, ", coeffs.b[i]);
+        }
+        printf("}\n");
     }
-    printf("}\n");
-
     return 1;
 }
 

@@ -10,9 +10,9 @@ CC = gcc
 all: sh-demo approx-cube
 	echo "building"
 
-sh-demo: render.c sdl_main.c texture.c mesh.c lin_math.c
+sh-demo: render.c sdl_main.c texture.c mesh.c lin_math.c sh9.c
 	${CC} -Os ${IFLAGS} ${LIBS} $^ -o $@
 
-approx-cube: approx_cube.c texture.c
+approx-cube: approx_cube.c texture.c sh9.c
 	${CC} -Os $^ -o $@
 

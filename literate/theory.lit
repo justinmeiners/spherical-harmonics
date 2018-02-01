@@ -61,6 +61,8 @@ Here is what some of these solutions look like:
 
 ![spherical harmonics](img/sh.jpg)
 
+You may recognize these from chemistry. There spherical harmonics also describe the probablity functions of [Atomic Orbitals](https://en.wikipedia.org/wiki/Atomic_orbital).
+
 The big idea is that we can take any function on a sphere (such as a light signal) and approximate it using sphereical harmonics. We simply calculate how much each term contributes to the overall signal and save those coeffecients. To recreate the signal we add up individual terms multiplied by the weighting coeffecients. This idea is very similar to fourier series in two dimensions.
 
 
@@ -94,38 +96,10 @@ $$\frac{\partial^{2} f}{\partial x^{2}}+\frac{\partial^{2} f}{\partial y^{2}}+\f
 
 The following structure stores the 9 spherical harmonics coeffecients for each of the red, green, and blue color channels. The total number of coeffecients is 27.
 
---- spherical harmonics struct
-#define SH_COUNT 9
-
-typedef struct
-{
-    float r[SH_COUNT];
-    float g[SH_COUNT];
-    float b[SH_COUNT];
-} ShCoeffs;
----
-
 This function calculates one of the first 9 spherical harmonics at a particular point on the unit sphere. Even though they are derived from a complex formula, then end results are very simple calculations. The most complex is the 9th harmonic which is only a quadratic computation. A table of spherical harmonics can be found [https://en.wikipedia.org/wiki/Table_of_spherical_harmonics](https://en.wikipedia.org/wiki/Table_of_spherical_harmonics).
 
 --- spherical harmonics
-
-static inline double sh_1()
-{
-    return 0.5 * sqrt(1.0 / M_PI);
-}
-
-static inline double sh_2(double x)
-{
-    return x * 0.5 * sqrt(3.0 / M_PI);
-}
-
-static inline double sh_3(double z)
-{
-    return z * 0.5 * sqrt(3.0 / M_PI);
-}
-
-
-static double sh9(int i, double x, double y, double z)
+static inline double sh_eval_9(int i, double x, double y, double z)
 {
     switch (i)
     {
@@ -154,16 +128,6 @@ static double sh9(int i, double x, double y, double z)
 }
 --- 
 
-
---- solid angle
-static double surface_area(double x, double y)
-{
-    return atan2(x * y, sqrt(x * x + y * y + 1.0));
-}
-
----
-
-
 For each spherical harmonic we need to calculute a coeffecient which describes how much a particular harmonic function contributes to the overall light signal. Each coeffecient is found by calculating the inner product of each function and the harmonic function.
 
 This calculation is a surface integral over the unit sphere of the product of the light signal and the harmonic function.
@@ -180,104 +144,156 @@ $$N=6w^{2}h^{2}$$
 
 --- integrate cubemap
 
-static ShCoeffs integrate_cubemap(Texture* cubemap)
+void sh_integrate_cubemap(const unsigned char** face_data,
+                          unsigned int width,
+                          unsigned int height,
+                          unsigned int components_per_pixel,
+                          ShChannel* out_channels)
 {
-    ShCoeffs coeffs;
-
-    // zero out the sums for accumlation
-    for (int i = 0; i < SH_COUNT; ++i)
+    // zero out coeffecients for accumulation
+    for (int comp = 0; comp < components_per_pixel; ++comp)
     {
-        coeffs.r[i] = 0.0;
-        coeffs.g[i] = 0.0;
-        coeffs.b[i] = 0.0;
+        for (int s = 0; s < SH_COUNT; ++s)
+            out_channels[comp].coeffs[s] = 0.0;
     }
-
-    double d_x = 1.0 / (double)cubemap->width;
-    double d_y = d_x;
-    double sum_da = 0.0;
 
     for (int face = 0; face < CUBE_FACE_COUNT; ++face)
     {
-        size_t offset = cubemap->image_info[face].offset;
-
-        for (int y = 0; y < cubemap->height; ++y)
+        for (int y = 0; y < height; ++y)
         {
-            for (int x = 0; x < cubemap->width; ++x)
+            for (int x = 0; x < width; ++x)
             {
                 // center each pixel
                 double px = (double)x + 0.5;
                 double py = (double)y + 0.5;
                 // normalize into [-1, 1] range
-                double u = 2.0 * (px / (double)cubemap->width) - 1.0;
-                double v = 2.0 * (py / (double)cubemap->height) - 1.0;
+                double u = 2.0 * (px / (double)width) - 1.0;
+                double v = 2.0 * (py / (double)height) - 1.0;
 
                 // calculate the solid angle
+                double d_x = 1.0 / (double)width;
                 double x0 = u - d_x;
-                double y0 = v - d_y;
+                double y0 = v - d_x;
                 double x1 = u + d_x;
-                double y1 = v + d_y;
-
+                double y1 = v + d_x;
                 double d_a = surface_area(x0, y0) - surface_area(x0, y1) - surface_area(x1, y0) + surface_area(x1, y1);
 
-                double dir_x, dir_y, dir_z;
-                switch (face)
+                // find vector on unit sphere
+                double dir[3];
+                uv_to_cube(u, v, face, dir);
+                normalize(dir, 3);
+  
+                size_t pixel_start = (x + y * width) * components_per_pixel;
+
+                for (int s = 0; s < SH_COUNT; ++s)
                 {
-                    case CUBE_FACE_RIGHT:
-                        dir_x = 1.0f;
-                        dir_y = v;
-                        dir_z = -u;
-                        break;
-                    case CUBE_FACE_LEFT:
-                        dir_x = -1.0f;
-                        dir_y = v;
-                        dir_z = u;
-                        break;
-                    case CUBE_FACE_TOP:
-                        dir_x = u;
-                        dir_y = 1.0f;
-                        dir_z = -v; 
-                        break;
-                    case CUBE_FACE_BOTTOM:
-                        dir_x = u;
-                        dir_y = -1.0f;
-                        dir_z = v;
-                        break;
-                    case CUBE_FACE_BACK: 
-                        dir_x = u;
-                        dir_y = v;
-                        dir_z = 1.0f;
-                        break;
-                    case CUBE_FACE_FRONT:
-                        dir_x = -u;
-                        dir_y = v;
-                        dir_z = -1.0f;
-                        break;
+                    double sh_val = sh_eval_9(s, dir[0], dir[1], dir[2]);
+
+                    for (int comp = 0; comp < components_per_pixel; ++comp)
+                    {
+                        double col = face_data[face][pixel_start + comp] / 255.0;
+                        out_channels[comp].coeffs[s] += col * sh_val * d_a;
+                    }
                 }
-                float norm = 1.0 / (dir_x * dir_x + dir_y * dir_y + dir_z * dir_z);
-                dir_x *= norm;
-                dir_y *= norm;
-                dir_z *= norm;
-
-                size_t pixel_start = offset + (x + y * cubemap->width) * 3;
-                double red = cubemap->data[pixel_start] / 255.0;
-                double green = cubemap->data[pixel_start + 1] / 255.0;
-                double blue = cubemap->data[pixel_start + 2] / 255.0;
-
-                double weight = d_a;
-                sum_da += weight;
-
-                for (int i = 0; i < SH_COUNT; ++i)
-                {
-                    double sh_val = sh9(i, dir_x, dir_y, dir_z);
-                    coeffs.r[i] += sh_val * red * weight;
-                    coeffs.g[i] += sh_val * green * weight;
-                    coeffs.b[i] += sh_val * blue * weight;
-                }
-            }
+           }
         }
     }
-    printf("total area: %f\n", sum_da);
-    return coeffs;
+}
+
+
+---
+
+--- solid angle
+static double surface_area(double x, double y)
+{
+    return atan2(x * y, sqrt(x * x + y * y + 1.0));
+}
+
+---
+
+--- channel struct
+#define SH_COUNT 9
+
+typedef struct
+{
+    double coeffs[SH_COUNT];
+} ShChannel;
+---
+
+
+--- sample shader
+float sh9(mat3 coef, vec3 n)
+{
+    float sum = coef[0][0] * 0.282095
+    + coef[1][0] * 0.488603 * n.x
+    + coef[2][0] * 0.488603 * n.z
+    + coef[0][1] * 0.488603 * n.y
+    + coef[1][1] * 1.092548 * n.x * n.z
+    + coef[2][1] * 1.092548 * n.y * n.z
+    + coef[0][2] * 1.092548 * n.x * n.y
+    + coef[1][2] * 0.315391 * (3.0 * n.z*n.z - 1.0)
+    + coef[2][2] * 0.546274 * (n.x*n.x - n.y*n.y);
+    return sum;
+}
+
+... 
+
+vec3 ambient = vec3(sh9(red_coeff, n), sh9(green_coeff, n), sh9(blue_coeff, n)); 
+---
+
+@s Utilties
+
+This function transforms a uv coordinate, the index of a cube face to a point on the unit cube.
+
+--- transform uv to cube
+static inline void uv_to_cube(double u, double v, int face, double* out_dir)
+{
+    switch (face)
+    {
+        case CUBE_FACE_RIGHT:
+            out_dir[0] = 1.0f;
+            out_dir[1] = v;
+            out_dir[2] = -u;
+            break;
+        case CUBE_FACE_LEFT:
+            out_dir[0] = -1.0f;
+            out_dir[1] = v;
+            out_dir[2] = u;
+            break;
+        case CUBE_FACE_TOP:
+            out_dir[0] = u;
+            out_dir[1] = 1.0f;
+            out_dir[2] = -v; 
+            break;
+        case CUBE_FACE_BOTTOM:
+            out_dir[0] = u;
+            out_dir[1] = -1.0f;
+            out_dir[2] = v;
+            break;
+        case CUBE_FACE_BACK: 
+            out_dir[0] = u;
+            out_dir[1] = v;
+            out_dir[2] = 1.0f;
+            break;
+        case CUBE_FACE_FRONT:
+            out_dir[0] = -u;
+            out_dir[1] = v;
+            out_dir[2] = -1.0f;
+            break;
+    }
+}
+---
+
+--- normalize vector
+static inline void normalize(double* dir, int n)
+{
+    double length_sqr = 0.0f;
+    for (int i = 0; i < n; ++i)
+        length_sqr += dir[i] * dir[i];
+
+    double scale = 1.0 / sqrt(length_sqr);
+    for (int i = 0; i < n; ++i)
+        dir[i] *= scale;
 }
 ---
 
@@ -286,24 +302,42 @@ static ShCoeffs integrate_cubemap(Texture* cubemap)
 #ifndef SH_9_H
 #define SH_9_H
 
+#include <math.h>
+#include <assert.h>
+/*
+
+SAMPLE SHADER
+
+Here is a sample shader function for evaluting the spherical harmonics. The functions are the same as in this header, but in numerical form. The 9 coeffecients for each color are stored in a 3x3 matrix.
+
+@{sample shader]
+
+*/
+
+
+@{channel struct}
+@{spherical harmonics}
+
+void sh_integrate_cubemap(const unsigned char** face_data,
+                          unsigned int width,
+                          unsigned int height,
+                          unsigned int components_per_pixel,
+                          ShChannel* out_channels);
 
 #endif
-
 ---
 
 --- sh9.c --- noWeave
-
-#include <assert.h>
+#include "sh9.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 #include "texture.h"
 
-@{spherical harmonics struct}
-@{spherical harmonics}
+@{normalize vector}
+@{transform uv to cube}
+
 @{solid angle}
 @{integrate cubemap}
-
 ---
 
 
@@ -314,12 +348,5 @@ static ShCoeffs integrate_cubemap(Texture* cubemap)
 2. [An Effecient Representation for Irradiance Environment Maps](https://graphics.stanford.edu/papers/envmap/)
 3. [MathWorld Laplace's Equation](http://mathworld.wolfram.com/LaplacesEquation.html)
 4. Linearity, Symmetry, And Prediction In The Hydrogen Atom
-
-
-
-
-
-
-
 
 
