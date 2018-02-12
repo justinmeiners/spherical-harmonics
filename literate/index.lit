@@ -8,6 +8,7 @@ Welcome to my explanation of Spherical Harmonics!
 Spherical Harmonics
 
 [Theory](theory.lit)
+[Mathematical Details](math.lit)
 [Model](model.lit)
 [Demo](demo.lit)
 [Linear Algebra Utilities](lin_math.lit)

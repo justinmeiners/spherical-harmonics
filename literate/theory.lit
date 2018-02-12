@@ -2,32 +2,25 @@
 
 @s Introduction
 
-In realtime computer graphics, objects are usually lit by both diffuse and ambient lighting. The diffuse lighting represents the direct radiance from nearby lights, while the ambient simulates light bounced from the scene. Since computing bounced lighting is usually too expensive for realtime rendering a much simpler replacement is use, with the most basic being a constant color (usually a dark gray) added to the diffuse light.
-
+In realtime computer graphics, objects are usually lit by both diffuse and ambient lighting. The diffuse lighting simulates the direct radiance from nearby lights, while the ambient simulates light bounced from the surrounding scene. Since computing bounced lighting is usually too slow for realtime rendering an approximation method must be used, with the most basic being a constant color (usually a dark gray) added to the diffuse light.
 
 ![diffuse term](img/teapot_diffuse.png)
 ![ambient term](img/teapot_ambient.png)
 ![combined](img/teapot_combined.png)
 
+Rendering algorithms which simulate some form of light bouncing from the scene are called [global illumination](https://en.wikipedia.org/wiki/Global_illumination) methods. In this paper I will explain how to implement a fast global illumination method using a mathematical tool called **spherical harmonics**. Spherical harmonics are a special set of functions that will be used to store a more complex ambient lighting signal with only 9 floats per color channel. The bounced lighting signal will the be recreated approximately in a vertex or fragment shader, using only these 9 floats.
 
-This paper is an explanation of the method described by Ramaoorthi. [2]
-I will explain how to calcluate a more rich ambient lighting 
+This method was originally described by Ramaoorthi. [2] This paper is a more in depth explanation of his work.
 
+@s Background
 
-This paper will explain the mathematical theory behind spherical harmonics and how to implement it. The method described in this paper was introduced by Ramamoorthi. [2]
-
-
-@s Previous Work
-
-
-
-In realtime computer graphics, environment maps are often used to simulate light reflected from the scene.
+Global illumination is often implemented by rendering environment maps which capture light reflected from the scene.
 
 Typically reflection probes are placed throughout the scene. At each probe, images of the surrounding enviornment are rendered to create a cubemap. At runtime, other scene objects search for the nearest probes and use its cubemaps to calculate reflections and ambient lighting.
 
 Unfortuantly, cubemaps require a significant amount of memory. A very low resolution RGB cubemap uses $64\times64\times6\times3\approx73kb$ and a high resolution RGB cubemap uses $1024\times1024\times6\times3\approx18mb$! Even though smooth reflections, such as glass or mirrors, require such high resolution, most enviornmental lighting is low frequency, meaning changes between shades are gradual.
 
-Since ambient light is low frequency, we can aim for a broad approximation of the overall signal, instead of crisp images. Valve's source engine accomplishes this by averaging the cubemap to a single color for each face. [1] Each of these colors is passed to the vertex shader and the surface normal is used to interpolate between values.
+Since ambient light is low frequency, we can aim for a rough approximation of the overall signal, instead of crisp images. Valve's source engine accomplishes this by averaging the cubemap to a single color for each face. [1] Each of these colors is passed to the vertex shader and the surface normal is used to interpolate between values.
 
 Valve's Ambient Cube is effecient and provides a richer ambient than a constant term, but only provides a rough approximation of ambient lighting. To store more complex ambient lighting we can use **spherical harmonics**. As we will explore, a good spherical harmonic approximation requires only 9 coeffecients to be stored, and is much richer than Valve's Ambient Cube.
 
@@ -37,14 +30,19 @@ These images from Valve's paper compare these three methods:
 ![valve ambient cube](img/ball_cube.jpg)
 ![valve ambient cube](img/ball_sh.jpg)
 
+@s Overview
 
+1. Render a cubemap of the surrounding scene.
+I will assume that this step is taken care of. Usually cubemaps are rendered offline, or when the scnee is loaded.
+2. Calculate spherical harmonic coeffecients from the cubemap.
 
+3. 
 
 @s Spherical Harmonics
 
 What are spherical harmonics?
 
-**Definition:** Laplace's equation is defined by the following: $$\nabla\cdot\nabla f=0$$.
+**Definition:** Laplace's equation states that the divergence of the gradient of a function is 0. It can be written as: $$\nabla\cdot\nabla f=0$$.
 
 In three variables Laplace's equation can be written as:
 
@@ -52,66 +50,13 @@ $$\frac{\partial^{2}}{\partial x^{2}}+\frac{\partial^{2}}{\partial y^{2}}+\frac{
 
 **Definition:** Equations which satisfy Laplace's equation are called **harmonics**. [3]
 
-Our objective will be to find equations which are defined on the sphere, which satiisfy laplace's equation.
+Our objective will be to find equations which are defined on the sphere, which satisfy laplace's equation.
 
-@s Laplace's Equation in Spherical Coordinates
+The derivation of these is pretty tedious and requires knowledge of spherical coordinates and partial differential equations. I show how these are derived [here](sh.html).
 
-By substituting variables, the 3 dimensional Laplace's equation can be transformed into spherical coordinates. This procedure is similar to change of variables for spherical integrals in multivariable calculus.
+Laplace's equation in spherical coordinates can be written as:
 
-A 3D sphere can be parameterized by three variables: radius, $\theta$ and $\phi$:
-
-$$x=r\sin(\phi)\cos(\theta)$$
-$$y=r\sin(\phi)\sin(\theta)$$
-$$z=r\cos(\phi)$$
-$$\theta=\arctan(\frac{y}{x})$$
-$$\phi=arccos(\frac{z}{r})$$
-$$r^{2}=x^{2}+y^{2}+z^{2}$$
-
-First derivative for x
-
-$$\frac{\partial}{\partial x}=\frac{\partial r}{\partial x}\frac{\partial}{\partial r} + \frac{\partial \theta}{\partial x}\frac{\partial}{\partial \theta} + \frac{\partial \phi}{\partial x}\frac{\partial}{\partial \phi}$$
-
-$$2r\frac{\partial r}{\partial x}=2x$$
-$$\frac{\partial r}{\partial x}=\frac{x}{r}=\sin(\phi)\cos(\theta)$$
-
-$$\frac{\partial \theta}{\partial x}=\frac{1}{1+\frac{y^{2}}{x^{2}}}(\frac{-y}{x^{2}})=\frac{-y}{x^{2}+y^{2}}=\frac{-\sin(\theta)}{r\sin(\phi)}$$
-
-First derivative for y
-
-$$\frac{\partial}{\partial y}=\frac{\partial r}{\partial z}\frac{\partial}{\partial r}+\frac{\partial \theta}{\partial y}\frac{\partial}{\partial \theta}+\frac{\partial \phi}{\partial y}\frac{\partial}{\partial \phi}$$
-
-$$2r\frac{\partial r}{\partial y}=2y$$
-$$\frac{\partial r}{\partial y}=\frac{y}{r}=\sin(\phi)\sin(\theta)$$
-$$\frac{\partial \theta}{\partial y}=\frac{1}{1+\frac{y^{2}}{x^{2}}}(\frac{1}{x})=\frac{x}{x^{2}+y^{2}}=\frac{\cos(\theta)}{r\sin(\phi)}$$
-$$\frac{\partial \phi}{\partial y}=\frac{-1}{\sqrt{1-\frac{z^{2}}{r^{2}}}}z(-1/2)(x^{2}+y^{2}+z^{2})^{-3/2}2y$$
-$$=\frac{r\cos{\phi}r\sin{\phi}\sin{\theta}}{\sin{\phi}(r^{3})}=\frac{\cos(\phi)\sin(\theta)}{r}$$
-
-First derivative for z
-
-$$2r\frac{\partial r}{\partial z}=2z$$
-$$\frac{\partial r}{\partial z}=\frac{z}{r}=\cos(\phi)$$
-$$\frac{\partial \theta}{\partial z}=0$$
-$$\frac{\partial \phi}{\partial z}=\frac{-1}{\sqrt{1-\frac{z^2}{r^2}}}(\frac{r - 1/2(x^{2}+y^{2}+z^{2})^{-3/2}(2z)(z)}{r^{2}})$$
-$$=\frac{-1}{\sqrt{1-\cos^{2}(\phi)}}(\frac{1}{r}-\frac{z^{2}}{r{^3}})$$
-$$=\frac{-1}{\sin \phi}(\frac{1}{r}-\frac{z^{2}}{r^{3}})=\frac{-1}{r\sin(\phi)}+\frac{\cos^{2}(\phi)}{r\sin(\phi)}$$
-$$=\frac{1-\sin^{2}(\phi)-1}{r\sin(\phi)}=\frac{-\sin(\phi)}{r}$$
-
-We will now proceed with the second deriative.
-
-Second order terms:
-
-
-
-
-The solutions are found below. [4]
-
-For $l=0$:
-
-$$\frac{1}{2\sqrt{\pi}}=$$
-
-For $l=1$:
-
-$$\frac{\sqrt{3}}{2\sqrt{2\pi}}$$
+$$\frac{\partial^{2}}{\partial r^{2}}+\frac{2}{r}\frac{\partial}{\partial r} + \frac{1}{r^{2}\sin^{2}(\phi)}\frac{\partial^{2}}{\partial \theta^{2}}+\frac{1}{r^{2}}\frac{\partial^{2}}{\partial \phi^{2}}+\frac{\cot(\phi)}{r^{2}}\frac{\partial}{\partial \phi}=0$$
 
 
 Here is what some of these solutions look like:
@@ -119,6 +64,7 @@ Here is what some of these solutions look like:
 ![spherical harmonics](img/sh.jpg)
 
 You may recognize these from chemistry. There spherical harmonics also describe the probablity functions of [Atomic Orbitals](https://en.wikipedia.org/wiki/Atomic_orbital).
+
 
 The big idea is that we can take any function on a sphere (such as a light signal) and approximate it using sphereical harmonics. We simply calculate how much each term contributes to the overall signal and save those coeffecients. To recreate the signal we add up individual terms multiplied by the weighting coeffecients. This idea is very similar to fourier series in two dimensions.
 
