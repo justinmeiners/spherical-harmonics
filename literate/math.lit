@@ -6,9 +6,9 @@ By substituting variables, the 3 dimensional Laplace's equation can be transform
 
 A 3D sphere can be parameterized by three variables: radius, $\theta$ and $\phi$:
 
-$$x=r\sin(\phi)\cos(\theta)$$
-$$y=r\sin(\phi)\sin(\theta)$$
-$$z=r\cos(\phi)$$
+$$x=r\sin\phi\cos\theta$$
+$$y=r\sin\phi\sin\theta$$
+$$z=r\cos\phi$$
 $$\theta=\arctan(\frac{y}{x})$$
 $$\phi=arccos(\frac{z}{r})$$
 $$r^{2}=x^{2}+y^{2}+z^{2}$$
@@ -18,9 +18,12 @@ First derivative for x
 $$\frac{\partial}{\partial x}=\frac{\partial r}{\partial x}\frac{\partial}{\partial r} + \frac{\partial \theta}{\partial x}\frac{\partial}{\partial \theta} + \frac{\partial \phi}{\partial x}\frac{\partial}{\partial \phi}$$
 
 $$2r\frac{\partial r}{\partial x}=2x$$
-$$\frac{\partial r}{\partial x}=\frac{x}{r}=\sin(\phi)\cos(\theta)$$
+$$\frac{\partial r}{\partial x}=\frac{x}{r}=\sin\phi\cos\theta$$
 
 $$\frac{\partial \theta}{\partial x}=\frac{1}{1+\frac{y^{2}}{x^{2}}}(\frac{-y}{x^{2}})=\frac{-y}{x^{2}+y^{2}}=\frac{-\sin(\theta)}{r\sin(\phi)}$$
+
+$$\frac{\partial \phi}{\partial x}=\frac{-1}{\sqrt{1-\frac{z^{2}}{r^{2}}}}z(\frac{-1}{2})(x^{2}+y^{2}+z^{2})^{-3/2}(2x)$$
+$$=\frac{zx}{\sqrt{1-\cos^{2}\phi}r^{3}}=\frac{\cos\phi\cos\theta}{r}$$
 
 First derivative for y
 
@@ -28,7 +31,7 @@ $$\frac{\partial}{\partial y}=\frac{\partial r}{\partial z}\frac{\partial}{\part
 
 $$2r\frac{\partial r}{\partial y}=2y$$
 $$\frac{\partial r}{\partial y}=\frac{y}{r}=\sin(\phi)\sin(\theta)$$
-$$\frac{\partial \theta}{\partial y}=\frac{1}{1+\frac{y^{2}}{x^{2}}}(\frac{1}{x})=\frac{x}{x^{2}+y^{2}}=\frac{\cos(\theta)}{r\sin(\phi)}$$
+$$\frac{\partial \theta}{\partial y}=\frac{1}{1+\frac{y^{2}}{x^{2}}}(\frac{1}{x})=\frac{x}{x^{2}+y^{2}}=\frac{\cos\theta}{r\sin\phi}$$
 $$\frac{\partial \phi}{\partial y}=\frac{-1}{\sqrt{1-\frac{z^{2}}{r^{2}}}}z(-1/2)(x^{2}+y^{2}+z^{2})^{-3/2}2y$$
 $$=\frac{r\cos{\phi}r\sin{\phi}\sin{\theta}}{\sin{\phi}(r^{3})}=\frac{\cos(\phi)\sin(\theta)}{r}$$
 
@@ -38,17 +41,37 @@ $$2r\frac{\partial r}{\partial z}=2z$$
 $$\frac{\partial r}{\partial z}=\frac{z}{r}=\cos(\phi)$$
 $$\frac{\partial \theta}{\partial z}=0$$
 $$\frac{\partial \phi}{\partial z}=\frac{-1}{\sqrt{1-\frac{z^2}{r^2}}}(\frac{r - 1/2(x^{2}+y^{2}+z^{2})^{-3/2}(2z)(z)}{r^{2}})$$
-$$=\frac{-1}{\sqrt{1-\cos^{2}(\phi)}}(\frac{1}{r}-\frac{z^{2}}{r{^3}})$$
-$$=\frac{-1}{\sin \phi}(\frac{1}{r}-\frac{z^{2}}{r^{3}})=\frac{-1}{r\sin(\phi)}+\frac{\cos^{2}(\phi)}{r\sin(\phi)}$$
-$$=\frac{1-\sin^{2}(\phi)-1}{r\sin(\phi)}=\frac{-\sin(\phi)}{r}$$
+$$=\frac{-1}{\sqrt{1-\cos^{2}\phi}}(\frac{1}{r}-\frac{z^{2}}{r{^3}})$$
+$$=\frac{-1}{\sin \phi}(\frac{1}{r}-\frac{z^{2}}{r^{3}})=\frac{-1}{r\sin\phi}+\frac{\cos^{2}\phi}{r\sin(\phi)}$$
+$$=\frac{1-\sin^{2}\phi-1}{r\sin\phi}=\frac{-\sin\phi}{r}$$
 
-We will now proceed with the second deriative.
+Here are all the terms together:
+$$\frac{\partial}{\partial x}=\sin\phi\cos\theta\frac{\partial }{\partial r}-\frac{\sin\theta}{r\sin\phi}\frac{\partial}{\partial \theta} + \frac{\cos\phi\cos\theta}{r}\frac{\partial}{\partial \phi}$$
+$$\frac{\partial}{\partial y}=\sin\phi\sin\theta\frac{\partial}{\partial r}+\frac{\cos\theta}{r\sin\phi}\frac{\partial}{\partial \theta}+\frac{\cos\phi\sin\theta}{r}\frac{\partial}{\partial \phi}$$
+$$\frac{\partial}{\partial z}=\cos\phi\frac{\partial}{\partial r} - \frac{\sin\phi}{r}\frac{\partial}{\partial\phi}$$
+
+We must now take the second deriative. Since there are going to be a lot of terms, it would be too unwieldy to start taking derivatives in order. Instead, we will organize them by differential terms, and then piece them together. In other words, instead of computing the product rule, we will compute one part of the product rule at a time.
 
 Second order terms:
 
-The solutions are found below. [4]
+$$\frac{\partial^{2}}{\partial r^{2}}:\sin^{2}\phi\cos^{2}\theta+\sin^{2}\phi\sin^{2}\theta+\cos^{2}\phi$$
+$$=\sin^{2}\phi(1)+\cos^{2}\phi=1$$
 
-For $l=0$:
+$$\frac{\partial^{2}}{\partial \theta^{2}}:\frac{\sin^{2}\theta}{r^{2}\sin^{2}\phi}+\frac{\cos^{2}\theta}{r^{2}\sin^{2}\phi}+0$$
+$$=\frac{1}{r^{2}\sin^{2}\phi}$$
+
+$$\frac{\partial^{2}}{\partial \phi^{2}}:\frac{\cos^{2}\phi\cos^{2}\theta}{r^{2}} + \frac{\cos^{2}\phi\sin^{2}\theta}{r^{2}} + \frac{\sin^{2}\phi}{r^{2}}$$
+$$=\frac{\cos^{2}\phi(1)+\sin^{2}\phi}{r^{2}}=\frac{1}{r^{2}}$$
+
+$$\frac{\partial^{2}}{\partial r \partial\theta}: \frac{2\sin\phi\cos\theta(-\sin\theta)}{r\sin\phi}+\frac{2\sin\phi\sin\theta(\cos\theta)}{r\sin\phi}+0=0$$
+$$\frac{\partial^{2}}{\partial r \partial\phi}: \frac{2\sin\phi\cos\phi\cos\theta}{r} + \frac{2\cos\phi\sin\phi\sin^{2}\theta}{r} -\frac{2\sin\phi\cos\phi}{r}$$
+
+
+
+
+The solutions are foeund below. [4]
+
+For $l=0$:r
 
 $$\frac{1}{2\sqrt{\pi}}=$$
 
