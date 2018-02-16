@@ -2,7 +2,7 @@
 
 @s Laplace's Equation in Spherical Coordinates
 
-By substituting variables, the 3 dimensional Laplace's equation can be transformed into spherical coordinates. This procedure is similar to change of variables for spherical integrals in multivariable calculus.
+The 3 dimensional Laplace's equation can be transformed into spherical coordinates, by changing variables. This procedure is similar to change of variables for spherical integrals in multivariable calculus.
 
 A 3D sphere can be parameterized by three variables: radius, $\theta$ and $\phi$:
 
@@ -27,7 +27,7 @@ $$=\frac{zx}{\sqrt{1-\cos^{2}\phi}r^{3}}=\frac{\cos\phi\cos\theta}{r}$$
 
 First derivative for y
 
-$$\frac{\partial}{\partial y}=\frac{\partial r}{\partial z}\frac{\partial}{\partial r}+\frac{\partial \theta}{\partial y}\frac{\partial}{\partial \theta}+\frac{\partial \phi}{\partial y}\frac{\partial}{\partial \phi}$$
+$$\frac{\partial}{\partial y}=\frac{\partial r}{\partial y}\frac{\partial}{\partial r}+\frac{\partial \theta}{\partial y}\frac{\partial}{\partial \theta}+\frac{\partial \phi}{\partial y}\frac{\partial}{\partial \phi}$$
 
 $$2r\frac{\partial r}{\partial y}=2y$$
 $$\frac{\partial r}{\partial y}=\frac{y}{r}=\sin(\phi)\sin(\theta)$$
@@ -37,6 +37,8 @@ $$=\frac{r\cos{\phi}r\sin{\phi}\sin{\theta}}{\sin{\phi}(r^{3})}=\frac{\cos(\phi)
 
 First derivative for z
 
+$$\frac{\partial}{\partial z}=\frac{\partial r}{\partial z}\frac{\partial}{\partial r}+\frac{\partial \theta}{\partial z}\frac{\partial}{\partial \theta}+\frac{\partial \phi}{\partial z}\frac{\partial}{\partial \phi}$$
+
 $$2r\frac{\partial r}{\partial z}=2z$$
 $$\frac{\partial r}{\partial z}=\frac{z}{r}=\cos(\phi)$$
 $$\frac{\partial \theta}{\partial z}=0$$
@@ -45,14 +47,18 @@ $$=\frac{-1}{\sqrt{1-\cos^{2}\phi}}(\frac{1}{r}-\frac{z^{2}}{r{^3}})$$
 $$=\frac{-1}{\sin \phi}(\frac{1}{r}-\frac{z^{2}}{r^{3}})=\frac{-1}{r\sin\phi}+\frac{\cos^{2}\phi}{r\sin(\phi)}$$
 $$=\frac{1-\sin^{2}\phi-1}{r\sin\phi}=\frac{-\sin\phi}{r}$$
 
-Here are all the terms together:
+Here are all the first derivatives together:
 $$\frac{\partial}{\partial x}=\sin\phi\cos\theta\frac{\partial }{\partial r}-\frac{\sin\theta}{r\sin\phi}\frac{\partial}{\partial \theta} + \frac{\cos\phi\cos\theta}{r}\frac{\partial}{\partial \phi}$$
 $$\frac{\partial}{\partial y}=\sin\phi\sin\theta\frac{\partial}{\partial r}+\frac{\cos\theta}{r\sin\phi}\frac{\partial}{\partial \theta}+\frac{\cos\phi\sin\theta}{r}\frac{\partial}{\partial \phi}$$
 $$\frac{\partial}{\partial z}=\cos\phi\frac{\partial}{\partial r} - \frac{\sin\phi}{r}\frac{\partial}{\partial\phi}$$
 
-We must now take the second deriative. Since there are going to be a lot of terms, it would be too unwieldy to start taking derivatives in order. Instead, we will organize them by differential terms, and then piece them together. In other words, instead of computing the product rule, we will compute one part of the product rule at a time.
+We must now take the second deriative by applying each of the first derivatives to themselves. Because of the chain rule, each term in the first derivative needs to be applied to each other term. For each $\frac{\partial}{\partial r}$, $\frac{\partial}{\partial \theta}$, $\frac{\partial}{\partial \phi}$ there will be 9 terms, and each of these will require the product rule, so $9(3)(2)=54$ total.
 
-Second order terms:
+$$\frac{\partial^{2}}{\partial x^{2}}=\frac{\partial}{\partial x}(\frac{\partial}{\partial x})$$
+
+With so many terms, it would be too unwieldy to start taking derivatives in order. Instead, we will organize them by differential terms, and then piece them together. Also, instead of computing the product rule, we will compute one part of the product rule at a time. As we will see, many of the terms will drop out anyway.
+
+Second order terms (9 total):
 
 $$\frac{\partial^{2}}{\partial r^{2}}:\sin^{2}\phi\cos^{2}\theta+\sin^{2}\phi\sin^{2}\theta+\cos^{2}\phi$$
 $$=\sin^{2}\phi(1)+\cos^{2}\phi=1$$
@@ -63,26 +69,40 @@ $$=\frac{1}{r^{2}\sin^{2}\phi}$$
 $$\frac{\partial^{2}}{\partial \phi^{2}}:\frac{\cos^{2}\phi\cos^{2}\theta}{r^{2}} + \frac{\cos^{2}\phi\sin^{2}\theta}{r^{2}} + \frac{\sin^{2}\phi}{r^{2}}$$
 $$=\frac{\cos^{2}\phi(1)+\sin^{2}\phi}{r^{2}}=\frac{1}{r^{2}}$$
 
+Mixed partial terms (18 total):
+
 $$\frac{\partial^{2}}{\partial r \partial\theta}: \frac{2\sin\phi\cos\theta(-\sin\theta)}{r\sin\phi}+\frac{2\sin\phi\sin\theta(\cos\theta)}{r\sin\phi}+0=0$$
-$$\frac{\partial^{2}}{\partial r \partial\phi}: \frac{2\sin\phi\cos\phi\cos\theta}{r} + \frac{2\cos\phi\sin\phi\sin^{2}\theta}{r} -\frac{2\sin\phi\cos\phi}{r}$$
+$$\frac{\partial^{2}}{\partial r \partial\phi}: \frac{2\sin\phi\cos\phi\cos^{2}\theta}{r} + \frac{2\cos\phi\sin\phi\sin^{2}\theta}{r} -\frac{2\sin\phi\cos\phi}{r}$$
+$$=\frac{2\sin\phi\cos\theta(1) - 2\sin\phi\cos\theta}{r}=0$$
+
+$$\frac{\partial^{2}}{\partial\theta \partial\phi}: \frac{-2\sin\theta\cos\phi\cos\theta}{r^{2}\sin\phi} + \frac{2\cos\theta\cos\phi\sin\theta}{r^{2}\sin\phi}=0$$
+
+First order terms (27 total):
+
+$$\frac{\partial}{\partial r}: \sin\phi\cos\theta\frac{\partial}{\partial r}(\sin\phi\cos\theta) + \frac{-\sin\theta}{r\sin\phi}\frac{\partial}{\partial \theta}(\sin\phi\cos\theta) + \frac{\cos\phi\cos\theta}{r}\frac{\partial}{\partial\phi}(\sin\phi\cos\theta) $$
+$$+\sin\phi\sin\theta\frac{\partial}{\partial r}(\sin\phi\sin\theta)+\frac{\cos\theta}{r\sin\phi}\frac{\partial}{\partial \theta}(\sin\phi\sin\theta)+\frac{\cos\phi\sin\theta}{r}\frac{\partial}{\partial\phi}(\sin\phi\sin\theta)$$
+$$+\cos\phi\frac{\partial}{\partial r}(\cos\phi) - \frac{\sin\phi}{r}\frac{\partial}{\partial \phi}(\cos\phi)$$
+
+$$=0+\frac{\sin^{2}\theta}{r}+\frac{\cos^{2}\phi\cos^{2}\theta}{r} + 0 + \frac{\cos^{2}\theta}{r} + \frac{\cos^{2}\phi\sin^{2}\theta}{r}+0+\frac{\sin^{2}\phi}{r}$$
+
+$$=\frac{1}{r}+\frac{\cos^{2}\phi +\sin^{2}\phi}{r}=\frac{2}{r}$$
+
+$$\frac{\partial}{\partial \theta}: \sin\phi\cos\theta\frac{\partial}{\partial r}(\frac{-\sin\theta}{r\sin\phi}) + \frac{-\sin\theta}{r\sin\phi}\frac{\partial}{\partial \theta}(\frac{-\sin\theta}{r\sin\phi}) + \frac{\cos\phi\cos\theta}{r}\frac{\partial}{\partial \phi}(\frac{-\sin\theta}{r\sin\phi})$$ 
+$$+ \sin\phi\sin\theta\frac{\partial}{\partial r}(\frac{\cos\theta}{r\sin\phi}) + \frac{\cos\theta}{r\sin\phi}\frac{\partial}{\partial\theta}(\frac{\cos\theta}{r\sin\phi}) + \frac{\cos\phi\sin\theta}{r}\frac{\partial}{\partial \phi}(\frac{\cos\theta}{r\sin\phi})$$
+$$=0$$
+
+$$\frac{\partial}{\partial \phi}: \sin\phi\cos\theta\frac{\partial}{\partial r}(\frac{\cos\phi\cos\theta}{r}) - \frac{\sin\theta}{r\sin\phi}\frac{\partial}{\partial\theta}(\frac{\cos\phi\cos\theta}{r}) + \frac{\cos\phi\cos\theta}{r}\frac{\partial}{\partial\phi}(\frac{\cos\phi\cos\theta}{r})$$
+$$+\sin\phi\sin\theta\frac{\partial}{\partial r}(\frac{\cos\phi\sin\theta}{r}) + \frac{\cos\theta}{r\sin\phi}\frac{\partial}{\partial\theta}(\frac{\cos\phi\sin\theta}{r}) + \frac{\cos\phi\sin\theta}{r}\frac{\partial}{\partial\phi}(\frac{\cos\phi\sin\theta}{r})$$
+$$+\cos\phi\frac{\partial}{\partial r}(\frac{-\sin\phi}{r})-\frac{\sin\phi}{r}\frac{\partial}{\partial\phi}(\frac{-\sin\phi}{r})$$
+$$=\frac{-\sin\phi\cos\phi\cos^{2}\theta}{r^{2}}+\frac{\sin^{2}\theta\cos\phi}{r^{2}\sin\phi}-\frac{\cos\phi\sin\phi\cos^{2}\theta}{r^{2}}$$
+$$-\frac{\sin\phi\cos\phi\sin^{2}\theta}{r^{2}}+\frac{\cos\phi\cos^{2}\theta}{r^{2}\sin\phi}-\frac{\sin\phi\cos\phi\sin^{2}\theta}{r^{2}}$$
+$$+\frac{\cos\phi\sin\phi}{r^{2}}+\frac{\cos\phi\sin\phi}{r}$$
+$$=\frac{-\sin\phi\cos\phi(1)}{r^{2}}+\frac{\cos\phi(1)}{r^{2}\sin\phi} - \frac{\sin\phi\cos\phi(1)}{r^{2}} + \frac{2\cos\phi\sin\phi}{r^{2}}$$
+$$=\frac{\cot\phi}{r^{2}}$$
 
 
+Final:
 
-
-The solutions are foeund below. [4]
-
-For $l=0$:r
-
-$$\frac{1}{2\sqrt{\pi}}=$$
-
-For $l=1$:
-
-$$\frac{\sqrt{3}}{2\sqrt{2\pi}}$$
-
-
-
-
-@s Solutions
-
+$$\frac{\partial^{2}}{\partial r^{2}} + \frac{2}{r}\frac{\partial}{\partial r} + \frac{1}{r^{2}\sin^{2}\phi}\frac{\partial^{2}}{\partial\theta^{2}} + \frac{1}{r^{2}}\frac{\partial^{2}}{\partial \phi^{2}}+\frac{\cot\phi}{r^{2}}\frac{\partial}{\partial \phi}$$
 
 
