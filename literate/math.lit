@@ -52,13 +52,13 @@ $$\frac{\partial}{\partial x}=\sin\phi\cos\theta\frac{\partial }{\partial r}-\fr
 $$\frac{\partial}{\partial y}=\sin\phi\sin\theta\frac{\partial}{\partial r}+\frac{\cos\theta}{r\sin\phi}\frac{\partial}{\partial \theta}+\frac{\cos\phi\sin\theta}{r}\frac{\partial}{\partial \phi}$$
 $$\frac{\partial}{\partial z}=\cos\phi\frac{\partial}{\partial r} - \frac{\sin\phi}{r}\frac{\partial}{\partial\phi}$$
 
-We must now take the second deriative by applying each of the first derivatives to themselves. Because of the chain rule, each term in the first derivative needs to be applied to each other term. For each $\frac{\partial}{\partial r}$, $\frac{\partial}{\partial \theta}$, $\frac{\partial}{\partial \phi}$ there will be 9 terms, and each of these will require the product rule, so $9(3)(2)=54$ total.
+We must now take the second deriative by applying each of the first derivatives to themselves. Because of the chain rule, each term in the first derivative needs to be applied to each other term. For each $\frac{\partial}{\partial r}$, $\frac{\partial}{\partial \theta}$, there will be 9 terms and for $\frac{\partial}{\partial \phi}$ there will be 4 terms. Each term will require the product rule, so double them, for $(9(2)+4)2=44$ total.
 
 $$\frac{\partial^{2}}{\partial x^{2}}=\frac{\partial}{\partial x}(\frac{\partial}{\partial x})$$
 
 With so many terms, it would be too unwieldy to start taking derivatives in order. Instead, we will organize them by differential terms, and then piece them together. Also, instead of computing the product rule, we will compute one part of the product rule at a time. As we will see, many of the terms will drop out anyway.
 
-Second order terms (9 total):
+Second order terms (8 total):
 
 $$\frac{\partial^{2}}{\partial r^{2}}:\sin^{2}\phi\cos^{2}\theta+\sin^{2}\phi\sin^{2}\theta+\cos^{2}\phi$$
 $$=\sin^{2}\phi(1)+\cos^{2}\phi=1$$
@@ -69,7 +69,7 @@ $$=\frac{1}{r^{2}\sin^{2}\phi}$$
 $$\frac{\partial^{2}}{\partial \phi^{2}}:\frac{\cos^{2}\phi\cos^{2}\theta}{r^{2}} + \frac{\cos^{2}\phi\sin^{2}\theta}{r^{2}} + \frac{\sin^{2}\phi}{r^{2}}$$
 $$=\frac{\cos^{2}\phi(1)+\sin^{2}\phi}{r^{2}}=\frac{1}{r^{2}}$$
 
-Mixed partial terms (18 total):
+Mixed partial terms (14 total):
 
 $$\frac{\partial^{2}}{\partial r \partial\theta}: \frac{2\sin\phi\cos\theta(-\sin\theta)}{r\sin\phi}+\frac{2\sin\phi\sin\theta(\cos\theta)}{r\sin\phi}+0=0$$
 $$\frac{\partial^{2}}{\partial r \partial\phi}: \frac{2\sin\phi\cos\phi\cos^{2}\theta}{r} + \frac{2\cos\phi\sin\phi\sin^{2}\theta}{r} -\frac{2\sin\phi\cos\phi}{r}$$
@@ -77,7 +77,7 @@ $$=\frac{2\sin\phi\cos\theta(1) - 2\sin\phi\cos\theta}{r}=0$$
 
 $$\frac{\partial^{2}}{\partial\theta \partial\phi}: \frac{-2\sin\theta\cos\phi\cos\theta}{r^{2}\sin\phi} + \frac{2\cos\theta\cos\phi\sin\theta}{r^{2}\sin\phi}=0$$
 
-First order terms (27 total):
+First order terms (22 total):
 
 $$\frac{\partial}{\partial r}: \sin\phi\cos\theta\frac{\partial}{\partial r}(\sin\phi\cos\theta) + \frac{-\sin\theta}{r\sin\phi}\frac{\partial}{\partial \theta}(\sin\phi\cos\theta) + \frac{\cos\phi\cos\theta}{r}\frac{\partial}{\partial\phi}(\sin\phi\cos\theta) $$
 $$+\sin\phi\sin\theta\frac{\partial}{\partial r}(\sin\phi\sin\theta)+\frac{\cos\theta}{r\sin\phi}\frac{\partial}{\partial \theta}(\sin\phi\sin\theta)+\frac{\cos\phi\sin\theta}{r}\frac{\partial}{\partial\phi}(\sin\phi\sin\theta)$$

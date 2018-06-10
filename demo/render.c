@@ -50,12 +50,12 @@ if (use_cube) { \
     ambient = textureCube(u_cube, v_normal).xyz; \
 } else { ambient = vec3(sh9(sh_r, v_normal), sh9(sh_g, v_normal), sh9(sh_b, v_normal)); }\
     float power = max(dot(v_normal, vec3(1.0, 1.0, 0.0)), 0.0); \
-    gl_FragColor = vec4(ambient + power * vec3(1.0, 1.0, 1.0), 1.0); \
+    gl_FragColor = vec4(ambient, 1.0); \
 }";
 
-const float sh9_red[] = {0.602287, 0.075701, 0.037782, -0.007927, 0.022855, 0.014070, -0.034561, -0.207028, 0.283061, };
-const float sh9_green[] = {0.430788, 0.056438, 0.027313, -0.016096, 0.016881, 0.012306, -0.032914, -0.148270, 0.200473, };
-const float sh9_blue[] = {0.352572, 0.066327, 0.025856, -0.016227, 0.017510, 0.013039, -0.026501, -0.121577, 0.161831, };
+const float sh9_red[] = {1.255929, -0.030145, 0.097466, -0.093892, 0.015190, 0.019376, 0.010265, -0.015090, -0.106750, };
+const float sh9_green[] = {1.075549, -0.049193, 0.069293, -0.082758, 0.006025, 0.059489, 0.015852, -0.008013, -0.092855, };
+const float sh9_blue[] = {0.782593, -0.061265, 0.037183, -0.053628, 0.004904, 0.078863, 0.016973, 0.011615, -0.056541, };
 
 
 static GLuint compile_shader(GLint shaderType, const char* shaderSource, int debug)
@@ -166,15 +166,15 @@ void render_init()
     scene.target = vec3_create(0.0f, 1.0f, 0.0f);
     scene.eye_rotation = mat4_create_identity();
 
-    scene.demo = mesh_load("data/astronaut.stl");
+    scene.demo = mesh_load("data/vase.stl");
     upload_mesh(&scene.demo);
 
-    const char* paths[] = {"data/cube2/posx.jpg",
-                           "data/cube2/negx.jpg",
-                           "data/cube2/posy.jpg",
-                           "data/cube2/negy.jpg",
-                           "data/cube2/posz.jpg",
-                           "data/cube2/negz.jpg"};
+    const char* paths[] = {"data/cube1/posx.jpg",
+                           "data/cube1/negx.jpg",
+                           "data/cube1/posy.jpg",
+                           "data/cube1/negy.jpg",
+                           "data/cube1/posz.jpg",
+                           "data/cube1/negz.jpg"};
 
     scene.cube = cubemap_load(paths);
     upload_cubemap(&scene.cube);

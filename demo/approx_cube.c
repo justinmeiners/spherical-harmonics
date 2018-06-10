@@ -5,12 +5,12 @@
 
 int main(int argc, const char* argv[])
 {
-    const char* paths[] = {"data/cube2/posx.jpg",
-                           "data/cube2/negx.jpg",
-                           "data/cube2/posy.jpg",
-                           "data/cube2/negy.jpg",
-                           "data/cube2/posz.jpg",
-                           "data/cube2/negz.jpg"};
+    const char* paths[] = {"data/cube1/posx.jpg",
+                           "data/cube1/negx.jpg",
+                           "data/cube1/posy.jpg",
+                           "data/cube1/negy.jpg",
+                           "data/cube1/posz.jpg",
+                           "data/cube1/negz.jpg"};
 
     Texture cube = cubemap_load(paths);
 
@@ -29,7 +29,7 @@ int main(int argc, const char* argv[])
         printf("%s {", channel_names[comp]);
         for (int s = 0; s < SH_COUNT; ++s)
         {
-            printf("%lf ", channels[comp].coeffs[s]);
+            printf("%lf, ", channels[comp].coeffs[s]);
 
         }
         printf("}\n");
