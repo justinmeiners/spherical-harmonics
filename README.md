@@ -1,7 +1,10 @@
 # sphereical-harmonics
 
-This is a research paper for my Mathematics Capstone course.
+This is a demo for my research paper for my Mathematics Capstone course.
 
+It is also my first project using [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming)
+
+Thanks to the creator of [Literate](https://github.com/zyedidia/Literate)
 
 ## Project License
 
