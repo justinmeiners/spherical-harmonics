@@ -52,12 +52,9 @@ $$\frac{\partial^{2}}{\partial x^{2}}+\frac{\partial^{2}}{\partial y^{2}}+\frac{
 
 Our objective will be to find equations which are defined on the sphere, which satisfy laplace's equation.
 
-The derivation of these is pretty tedious and requires knowledge of spherical coordinates and partial differential equations. I show how these are derived [here](sh.html).
-
 Laplace's equation in spherical coordinates can be written as:
 
 $$\frac{\partial^{2}}{\partial r^{2}}+\frac{2}{r}\frac{\partial}{\partial r} + \frac{1}{r^{2}\sin^{2}(\phi)}\frac{\partial^{2}}{\partial \theta^{2}}+\frac{1}{r^{2}}\frac{\partial^{2}}{\partial \phi^{2}}+\frac{\cot(\phi)}{r^{2}}\frac{\partial}{\partial \phi}=0$$
-
 
 Here is what some of these solutions look like:
 
@@ -65,9 +62,7 @@ Here is what some of these solutions look like:
 
 You may recognize these from chemistry. There spherical harmonics also describe the probablity functions of [Atomic Orbitals](https://en.wikipedia.org/wiki/Atomic_orbital).
 
-
 The big idea is that we can take any function on a sphere (such as a light signal) and approximate it using sphereical harmonics. We simply calculate how much each term contributes to the overall signal and save those coeffecients. To recreate the signal we add up individual terms multiplied by the weighting coeffecients. This idea is very similar to fourier series in two dimensions.
-
 
 How do we calculate how much each term contributes? The inner product gives us the component of a vector along another vector. 
 

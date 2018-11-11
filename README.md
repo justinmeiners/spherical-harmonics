@@ -1,10 +1,31 @@
 # sphereical-harmonics
 
-This is a demo for my research paper for my Mathematics Capstone course.
+This project shows how to implement spherical harmonics for precalculating lighting in 3D environments. Spherical harmonics are primarily useful in graphics for compactly storing a rough approximation of irradiance. This method can approximate a cube map with just 9 floating point numbers. 
 
-It is also my first project using [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming)
+I creates this project for my mathematics capstone course. But, I ended up doing more programming than math. 
 
-Thanks to the creator of [Literate](https://github.com/zyedidia/Literate)
+The demo is a [Literate Program](https://en.wikipedia.org/wiki/Literate_programming). Thanks to the creator of [Literate](https://github.com/zyedidia/Literate)
+
+## Includes
+
+- `demo/` - Contains the generated C source code for the actual demo program. Requires SDL2 to build.
+
+- `literate/` - Commentary on the source code and a practical overview of spherical harmonics. I started this for my paper, but it was too much of an engineering projects, and not enough math. I then switched to the approach in the papers folder. The commentary here is very incomplete and unpolished, but they are still useful.
+
+- `paper/functions.tex` - This paper introduces the theory of orthogonal systems and generalized fourier series from a mathematical point of view. There is no original research here. I wrote it for the purpose of understanding how Spherical Harmonics work. 
+
+- `paper/laplace.tex` - This paper presents an organized way to transform Laplace's equation into spherical coordinates. Many differential equations textbooks mention that this can be done, but none I have seen actually show how to do it.
+
+
+## Screenshots
+
+- ![cubemap reflection](screenshots/cubemap.png)
+- ![spherical harmonics approximation](screenshots/sh.png)
+
+## Further Reading
+
+1. [An Effecient Representation for Irradiance Environment Maps](https://graphics.stanford.edu/papers/envmap/)
+2. [Shading in Valve's Source Engine](http://www.valvesoftware.com/publications/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf)
 
 ## Project License
 
