@@ -1,4 +1,4 @@
-# sphereical-harmonics
+# Spherical Harmonics
 
 This project shows how to implement spherical harmonics for precalculating lighting in 3D environments. Spherical harmonics are primarily useful in graphics for compactly storing a rough approximation of irradiance. This method can approximate a cube map with just 9 floating point numbers. 
 
@@ -19,8 +19,11 @@ The demo is a [Literate Program](https://en.wikipedia.org/wiki/Literate_programm
 
 ## Screenshots
 
-- ![cubemap reflection](screenshots/cubemap.png)
-- ![spherical harmonics approximation](screenshots/sh.png)
+Perfect reflection of cubemap.
+![cubemap reflection](screenshots/cubemap.png)
+
+Spherical harmonics approximation.
+![spherical harmonics approximation](screenshots/sh.png)
 
 ## Further Reading
 
