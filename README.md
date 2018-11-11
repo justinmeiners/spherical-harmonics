@@ -19,9 +19,11 @@ The demo is a [Literate Program](https://en.wikipedia.org/wiki/Literate_programm
 ## Screenshots
 
 Cubemap reflection.
+
 ![cubemap reflection](screenshots/cubemap.png)
 
 Spherical harmonics approximation.
+
 ![spherical harmonics approximation](screenshots/sh.png)
 
 ## Further Reading
