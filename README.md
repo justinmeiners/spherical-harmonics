@@ -1,25 +1,24 @@
 # Spherical Harmonics
 
-This project shows how to implement spherical harmonics for precalculating lighting in 3D environments. Spherical harmonics are primarily useful in graphics for compactly storing a rough approximation of irradiance. This method can approximate a cube map with just 9 floating point numbers. 
+This project shows how to use spherical harmonics for pre-calculating lighting in 3D environments. Spherical harmonics are primarily useful because the irradiance (incoming light) can be stored very compactly, and rendered effeciently. The traditional solution for irradience is to encode lighting in cube or spherical texture maps. The spherical harmonics method can approximate a low-frequency cube map with just 9 floating point numbers.
 
-I creates this project for my mathematics capstone course. But, I ended up doing more programming than math. 
+I created this project for my mathematics capstone course. The end result here turned out to be more of a programming project than a math one, but behind the scenes I learned a lot about the math as well.
 
 The demo is a [Literate Program](https://en.wikipedia.org/wiki/Literate_programming). Thanks to the creator of [Literate](https://github.com/zyedidia/Literate)
 
-## Includes
+## Contents
 
-- `demo/` - Contains the generated C source code for the actual demo program. Requires SDL2 to build.
+- `demo/` - The C source code for the demo program. Generated (woven) from the literate files. Requires SDL 2 to build.
 
-- `literate/` - Commentary on the source code and a practical overview of spherical harmonics. I started this for my paper, but it was too much of an engineering projects, and not enough math. I then switched to the approach in the papers folder. The commentary here is very incomplete and unpolished, but they are still useful.
+- `literate/` - Commentary on the source code and a practical overview of spherical harmonics. I started this with the intention of using it for my paper, but the approach was more like an engineering project than a math one. I then switched to the approach in the papers folder. The commentary here is very incomplete and unpolished, but is probably still useful.
 
 - `paper/functions.tex` - This paper introduces the theory of orthogonal systems and generalized fourier series from a mathematical point of view. There is no original research here. I wrote it for the purpose of understanding how Spherical Harmonics work. 
 
-- `paper/laplace.tex` - This paper presents an organized way to transform Laplace's equation into spherical coordinates. Many differential equations textbooks mention that this can be done, but none I have seen actually show how to do it.
-
+- `paper/laplace.tex` - This paper presents an organized way to transform Laplace's equation into spherical coordinates. Many differential equations textbooks mention that this can be done, but none of them actually show how to do it.
 
 ## Screenshots
 
-Perfect reflection of cubemap.
+Cubemap reflection.
 ![cubemap reflection](screenshots/cubemap.png)
 
 Spherical harmonics approximation.
