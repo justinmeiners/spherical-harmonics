@@ -2,15 +2,13 @@
 
 This project shows how to use spherical harmonics for pre-calculating lighting in 3D environments. Spherical harmonics are primarily useful because the irradiance (incoming light) can be stored very compactly, and rendered effeciently. The traditional solution for irradience is to encode lighting in cube or spherical texture maps. The spherical harmonics method can approximate a low-frequency cube map with just 9 floating point numbers.
 
-I created this project for my mathematics capstone course. The end result here turned out to be more of a programming project than a math one, but behind the scenes I learned a lot about the math as well.
+I created this project for my mathematics capstone course. The end result turned out to be more of a programming project than a math one, but behind the scenes I learned a lot about the math as well. 
 
 The demo is a [Literate Program](https://en.wikipedia.org/wiki/Literate_programming). Thanks to the creator of [Literate](https://github.com/zyedidia/Literate)
 
 ## Contents
 
-- `demo/` - The C source code for the demo program. Generated (woven) from the literate files. Requires SDL 2 to build.
-
-- `literate/` - Commentary on the source code and a practical overview of spherical harmonics. I started this with the intention of using it for my paper, but the approach was more like an engineering project than a math one. I then switched to the approach in the papers folder. The commentary here is very incomplete and unpolished, but is probably still useful.
+- `demo/` - The C source code for the demo program.  Requires SDL 2 to build.
 
 - `paper/functions.tex` - This paper introduces the theory of orthogonal systems and generalized fourier series from a mathematical point of view. There is no original research here. I wrote it for the purpose of understanding how Spherical Harmonics work. 
 
@@ -25,11 +23,6 @@ Cubemap reflection.
 Spherical harmonics approximation.
 
 ![spherical harmonics approximation](screenshots/sh.png)
-
-## Further Reading
-
-1. [An Effecient Representation for Irradiance Environment Maps](https://graphics.stanford.edu/papers/envmap/)
-2. [Shading in Valve's Source Engine](http://www.valvesoftware.com/publications/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf)
 
 ## Project License
 
