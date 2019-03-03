@@ -4,8 +4,6 @@ This project shows how to use spherical harmonics for pre-calculating lighting i
 
 I created this project for my mathematics capstone course. The end result turned out to be more of a programming project than a math one, but behind the scenes I learned a lot about the math as well. 
 
-The demo is a [Literate Program](https://en.wikipedia.org/wiki/Literate_programming). Thanks to the creator of [Literate](https://github.com/zyedidia/Literate)
-
 ## Contents
 
 - `demo/` - The C source code for the demo program.  Requires SDL 2 to build.
